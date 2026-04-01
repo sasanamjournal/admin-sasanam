@@ -48,10 +48,10 @@ export const deleteDonation = (id: string) =>
 export const getNews = (params: Record<string, string | number>) =>
   api.get('/admin/news', { params })
 
-export const createNews = (data: Record<string, unknown>) =>
+export const createNews = (data: object) =>
   api.post('/admin/news', data)
 
-export const updateNews = (id: string, data: Record<string, unknown>) =>
+export const updateNews = (id: string, data: object) =>
   api.put(`/admin/news/${id}`, data)
 
 export const deleteNews = (id: string) =>
@@ -59,18 +59,18 @@ export const deleteNews = (id: string) =>
 
 // Team
 export const getTeam = () => api.get('/admin/team')
-export const createTeamMember = (data: Record<string, unknown>) =>
+export const createTeamMember = (data: object) =>
   api.post('/admin/team', data)
-export const updateTeamMember = (id: string, data: Record<string, unknown>) =>
+export const updateTeamMember = (id: string, data: object) =>
   api.put(`/admin/team/${id}`, data)
 export const deleteTeamMember = (id: string) =>
   api.delete(`/admin/team/${id}`)
 
 // Authors
 export const getAuthors = () => api.get('/admin/authors')
-export const createAuthor = (data: Record<string, unknown>) =>
+export const createAuthor = (data: object) =>
   api.post('/admin/authors', data)
-export const updateAuthor = (id: string, data: Record<string, unknown>) =>
+export const updateAuthor = (id: string, data: object) =>
   api.put(`/admin/authors/${id}`, data)
 export const deleteAuthor = (id: string) =>
   api.delete(`/admin/authors/${id}`)
