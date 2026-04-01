@@ -1,0 +1,209 @@
+import { useState } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { getUsers, updateUser, deleteUser } from '../api/endpoints'
+import { HiOutlineSearch, HiOutlineTrash, HiOutlineDownload, HiOutlineShieldCheck } from 'react-icons/hi'
+
+export default function Users() {
+  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState('')
+  const [searchInput, setSearchInput] = useState('')
+  const [roleFilter, setRoleFilter] = useState('')
+  const [subFilter, setSubFilter] = useState('')
+  const queryClient = useQueryClient()
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['users', page, search, roleFilter, subFilter],
+    queryFn: () =>
+      getUsers({ page, limit: 20, search, role: roleFilter, subscribed: subFilter }).then((r) => r.data.data),
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Record<string, unknown> }) => updateUser(id, body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('User updated')
+    },
+    onError: (err: any) => toast.error(err.response?.data?.error || 'Update failed'),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteUser,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+      toast.success('User deleted')
+    },
+    onError: (err: any) => toast.error(err.response?.data?.error || 'Delete failed'),
+  })
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    setSearch(searchInput)
+    setPage(1)
+  }
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Users</h1>
+        <p className="text-sm text-[#6A5A4A] mt-1">Manage user accounts, roles, and download access</p>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-[#fdfaf2] rounded-2xl p-4 border border-white/30 shadow-sm mb-6">
+        <div className="flex flex-wrap gap-3 items-center">
+          <form onSubmit={handleSearch} className="flex-1 min-w-[200px] relative">
+            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6A5A4A]/50" />
+            <input
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search by name or email..."
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30"
+            />
+          </form>
+          <select
+            value={roleFilter}
+            onChange={(e) => { setRoleFilter(e.target.value); setPage(1) }}
+            className="px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none"
+          >
+            <option value="">All Roles</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+          </select>
+          <select
+            value={subFilter}
+            onChange={(e) => { setSubFilter(e.target.value); setPage(1) }}
+            className="px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none"
+          >
+            <option value="">All Status</option>
+            <option value="true">Subscribed</option>
+            <option value="false">Not Subscribed</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Users Table */}
+      <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-40">
+            <div className="h-6 w-6 border-2 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#8B4513]/10 bg-[#f4ecd8]/50">
+                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Name</th>
+                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Email</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Role</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Subscribed</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Download</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Joined</th>
+                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.users?.map((user: any) => (
+                    <tr key={user._id} className="border-b border-[#8B4513]/5 hover:bg-white/30 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-[#8B4513]/10 flex items-center justify-center text-[#8B4513] text-xs font-black uppercase">
+                            {(user.fullName || '?').charAt(0)}
+                          </div>
+                          <span className="font-bold text-[#4A3B32] capitalize">{user.fullName}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-[#6A5A4A]">{user.email}</td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() =>
+                            updateMutation.mutate({
+                              id: user._id,
+                              body: { role: user.role === 'admin' ? 'user' : 'admin' },
+                            })
+                          }
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors ${
+                            user.role === 'admin'
+                              ? 'bg-purple-100 text-purple-700 hover:bg-purple-200'
+                              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          }`}
+                        >
+                          <HiOutlineShieldCheck className="w-3 h-3" />
+                          {user.role || 'user'}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          user.isSubscribed ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
+                        }`}>
+                          {user.isSubscribed ? 'Yes' : 'No'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() =>
+                            updateMutation.mutate({
+                              id: user._id,
+                              body: { canDownload: !user.canDownload },
+                            })
+                          }
+                          className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors ${
+                            user.canDownload
+                              ? 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
+                              : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                          }`}
+                        >
+                          <HiOutlineDownload className="w-3 h-3" />
+                          {user.canDownload ? 'Enabled' : 'Disabled'}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-center text-[#6A5A4A] text-xs">
+                        {new Date(user.createdAt).toLocaleDateString('en-IN')}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => {
+                            if (confirm('Delete this user?')) deleteMutation.mutate(user._id)
+                          }}
+                          className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                          <HiOutlineTrash className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Pagination */}
+            {data && data.totalPages > 1 && (
+              <div className="flex items-center justify-between px-4 py-3 border-t border-[#8B4513]/10">
+                <p className="text-xs text-[#6A5A4A]">
+                  Page {data.page} of {data.totalPages} ({data.total} users)
+                </p>
+                <div className="flex gap-2">
+                  <button
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => p - 1)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B4513] hover:bg-[#8B4513]/10 disabled:opacity-30 transition-colors"
+                  >
+                    Previous
+                  </button>
+                  <button
+                    disabled={page >= data.totalPages}
+                    onClick={() => setPage((p) => p + 1)}
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B4513] hover:bg-[#8B4513]/10 disabled:opacity-30 transition-colors"
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
