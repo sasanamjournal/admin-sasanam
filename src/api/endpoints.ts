@@ -101,3 +101,13 @@ export const updateAuthor = (id: string, data: FormData) =>
   api.put(`/admin/authors/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
 export const deleteAuthor = (id: string) =>
   api.delete(`/admin/authors/${id}`)
+
+// Contact Messages
+export const getContacts = (params: Record<string, string | number>) =>
+  api.get('/admin/contacts', { params })
+export const markContactRead = (id: string) =>
+  api.put(`/admin/contacts/${id}/read`)
+export const replyContact = (id: string, reply: string) =>
+  api.post(`/admin/contacts/${id}/reply`, { reply })
+export const deleteContact = (id: string) =>
+  api.delete(`/admin/contacts/${id}`)
