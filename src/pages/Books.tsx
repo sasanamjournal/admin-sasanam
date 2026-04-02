@@ -10,9 +10,10 @@ interface BookForm {
   authorName: string
   sectionId: string
   description: string
+  bookType: 'journal' | 'fullbook'
 }
 
-const emptyForm: BookForm = { bookName: '', authorName: '', sectionId: '', description: '' }
+const emptyForm: BookForm = { bookName: '', authorName: '', sectionId: '', description: '', bookType: 'journal' }
 
 export default function BooksPage() {
   const [showForm, setShowForm] = useState(false)
@@ -73,6 +74,7 @@ export default function BooksPage() {
       authorName: item.authorName,
       sectionId: item.sectionId?._id || item.sectionId || '',
       description: item.description || '',
+      bookType: item.bookType || 'journal',
     })
     setEditId(item._id)
     setPdfFile(null)
@@ -89,6 +91,7 @@ export default function BooksPage() {
     fd.append('authorName', form.authorName)
     fd.append('sectionId', form.sectionId)
     fd.append('description', form.description)
+    fd.append('bookType', String(form.bookType))
     if (pdfFile) fd.append('pdfFile', pdfFile)
     if (coverImage) fd.append('coverImage', coverImage)
 
@@ -145,68 +148,87 @@ export default function BooksPage() {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 overflow-y-auto">
-          <div className="bg-[#fdfaf2] rounded-2xl w-full max-w-lg shadow-2xl border border-white/30 my-8">
-            <div className="flex items-center justify-between p-5 border-b border-[#8B4513]/10">
-              <h2 className="text-lg font-bold text-[#4A3B32]">{editId ? 'Edit Book' : 'Add Book'}</h2>
+        <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 overflow-y-auto py-6 px-4">
+          <div className="bg-[#fdfaf2] rounded-2xl w-full max-w-md shadow-2xl border border-white/30">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[#8B4513]/10 sticky top-0 bg-[#fdfaf2] rounded-t-2xl z-10">
+              <h2 className="text-base font-bold text-[#4A3B32]">{editId ? 'Edit Book' : 'Add Book'}</h2>
               <button onClick={resetForm} className="p-1 text-[#6A5A4A] hover:text-[#8B4513]"><HiOutlineX className="w-5 h-5" /></button>
             </div>
-            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+            <form onSubmit={handleSubmit} className="px-4 py-3 space-y-3">
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Book Name</label>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Book Name</label>
                 <input value={form.bookName} onChange={(e) => setForm({ ...form, bookName: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+                  className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Author Name</label>
+                  <input value={form.authorName} onChange={(e) => setForm({ ...form, authorName: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Section</label>
+                  <select value={form.sectionId} onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
+                    className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required>
+                    <option value="">Select</option>
+                    {sections?.map((s: any) => (
+                      <option key={s._id} value={s._id}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Author Name</label>
-                <input value={form.authorName} onChange={(e) => setForm({ ...form, authorName: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
-              </div>
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Section</label>
-                <select value={form.sectionId} onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required>
-                  <option value="">Select a section</option>
-                  {sections?.map((s: any) => (
-                    <option key={s._id} value={s._id}>{s.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Description</label>
+                <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Description</label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  rows={3} maxLength={500}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30 resize-none" />
+                  rows={2} maxLength={500}
+                  className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30 resize-none" />
               </div>
 
-              {/* PDF Upload */}
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">
-                  PDF File {editId && '(leave empty to keep current)'}
-                </label>
-                <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
-                  <HiOutlineDocumentText className="w-5 h-5 text-[#8B4513]/60" />
-                  <span className="text-sm text-[#6A5A4A]">{pdfFile ? pdfFile.name : 'Choose PDF file (max 50MB)'}</span>
-                  <input ref={pdfRef} type="file" accept=".pdf" className="hidden"
-                    onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
-                </label>
+              {/* Full Book Toggle */}
+              <div className="flex items-center gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setForm({ ...form, bookType: form.bookType === 'fullbook' ? 'journal' : 'fullbook' })}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${form.bookType === 'fullbook' ? 'bg-[#8B4513]' : 'bg-[#8B4513]/20'}`}
+                >
+                  <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.bookType === 'fullbook' ? 'translate-x-5' : ''}`} />
+                </button>
+                <div>
+                  <label className="text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Full Book</label>
+                  <p className="text-[10px] text-[#6A5A4A] leading-tight">
+                    {form.bookType === 'fullbook' ? 'Sasanam page only' : 'Journal sections'}
+                  </p>
+                </div>
               </div>
 
-              {/* Cover Image Upload */}
-              <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">
-                  Cover Image {editId && '(leave empty to keep current)'}
-                </label>
-                <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
-                  <HiOutlinePhotograph className="w-5 h-5 text-[#8B4513]/60" />
-                  <span className="text-sm text-[#6A5A4A]">{coverImage ? coverImage.name : 'Choose cover image (JPEG/PNG/WebP)'}</span>
-                  <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
-                    onChange={(e) => setCoverImage(e.target.files?.[0] || null)} />
-                </label>
+              {/* File Uploads - side by side */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">
+                    PDF {editId && '(optional)'}
+                  </label>
+                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
+                    <HiOutlineDocumentText className="w-4 h-4 text-[#8B4513]/60 shrink-0" />
+                    <span className="text-xs text-[#6A5A4A] truncate">{pdfFile ? pdfFile.name : 'Choose PDF'}</span>
+                    <input ref={pdfRef} type="file" accept=".pdf" className="hidden"
+                      onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">
+                    Cover {editId && '(optional)'}
+                  </label>
+                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
+                    <HiOutlinePhotograph className="w-4 h-4 text-[#8B4513]/60 shrink-0" />
+                    <span className="text-xs text-[#6A5A4A] truncate">{coverImage ? coverImage.name : 'Choose image'}</span>
+                    <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                      onChange={(e) => setCoverImage(e.target.files?.[0] || null)} />
+                  </label>
+                </div>
               </div>
 
               <button type="submit" disabled={createMut.isPending || updateMut.isPending}
-                className="w-full py-3 rounded-xl bg-[#8B4513] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#a0522d] transition-colors disabled:opacity-50">
+                className="w-full py-2.5 rounded-lg bg-[#8B4513] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#a0522d] transition-colors disabled:opacity-50">
                 {(createMut.isPending || updateMut.isPending) ? 'Uploading...' : editId ? 'Update' : 'Create'}
               </button>
             </form>
@@ -236,7 +258,12 @@ export default function BooksPage() {
                   {data?.books?.map((book: any) => (
                     <tr key={book._id} className="border-b border-[#8B4513]/5 hover:bg-[#8B4513]/3 transition-colors">
                       <td className="px-5 py-3">
-                        <p className="font-bold text-[#4A3B32]">{book.bookName}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-[#4A3B32]">{book.bookName}</p>
+                          {book.bookType === 'fullbook' && (
+                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">Full Book</span>
+                          )}
+                        </div>
                         {book.description && <p className="text-xs text-[#6A5A4A] mt-0.5 line-clamp-1">{book.description}</p>}
                       </td>
                       <td className="px-5 py-3 text-[#6A5A4A]">{book.authorName}</td>
