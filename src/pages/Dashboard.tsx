@@ -203,7 +203,7 @@ export default function Dashboard() {
               <YAxis tick={{ fontSize: 12, fill: '#6A5A4A' }} axisLine={false} tickLine={false} tickFormatter={(v) => `₹${v}`} />
               <Tooltip
                 contentStyle={{ backgroundColor: '#fdfaf2', border: '1px solid #e5dcc8', borderRadius: '12px', boxShadow: '0 4px 20px rgba(0,0,0,0.1)' }}
-                formatter={(value: number) => [`₹${value.toLocaleString()}`, '']}
+                formatter={(value) => [`₹${Number(value).toLocaleString()}`, '']}
               />
               <Area type="monotone" dataKey="subscriptions" stroke="#8B4513" strokeWidth={2.5} fill="url(#subGrad)" name="Subscriptions" />
               <Area type="monotone" dataKey="donations" stroke="#d97706" strokeWidth={2.5} fill="url(#donGrad)" name="Donations" />
@@ -278,7 +278,7 @@ export default function Dashboard() {
                 cy="50%"
                 outerRadius={80}
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}
                 labelLine={false}
                 animationBegin={500}
                 animationDuration={1000}
@@ -288,7 +288,7 @@ export default function Dashboard() {
               </Pie>
               <Tooltip
                 contentStyle={{ backgroundColor: '#fdfaf2', border: '1px solid #e5dcc8', borderRadius: '12px' }}
-                formatter={(value: number) => [`₹${value.toLocaleString()}`, '']}
+                formatter={(value) => [`₹${Number(value).toLocaleString()}`, '']}
               />
             </PieChart>
           </ResponsiveContainer>
