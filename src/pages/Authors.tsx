@@ -68,7 +68,7 @@ export default function Authors() {
     setForm({ name: item.name, bookName: item.bookName, order: item.order || 0 })
     setEditId(item._id)
     setPhotoFile(null)
-    setPhotoPreview(item.photo ? `${API}/uploads/${item.photo}?w=360` : null)
+    setPhotoPreview(item.photo ? imgUrl(item.photo) : null)
     setShowForm(true)
   }
 
@@ -98,7 +98,11 @@ export default function Authors() {
     if (photoRef.current) photoRef.current.value = ''
   }
 
-  const imgUrl = (photo: string, w = 360) => photo ? `${API}/uploads/${photo}?w=${w}` : ''
+  const imgUrl = (photo: string, w = 360) => {
+    if (!photo) return ''
+    if (photo.startsWith('http')) return photo
+    return `${API}/uploads/${photo}?w=${w}`
+  }
 
   return (
     <div>
