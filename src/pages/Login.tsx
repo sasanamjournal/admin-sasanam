@@ -15,8 +15,8 @@ export default function Login() {
     setLoading(true)
     try {
       const { data } = await loginAdmin(email, password)
-      if (data.user?.role !== 'admin') {
-        toast.error('Admin access required')
+      if (!['mentor', 'admin', 'super_admin'].includes(data.user?.role)) {
+        toast.error('Admin panel access required')
         setLoading(false)
         return
       }

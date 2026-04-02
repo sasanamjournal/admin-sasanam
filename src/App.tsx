@@ -10,17 +10,11 @@ import DonationList from './pages/DonationList'
 import News from './pages/News'
 import Team from './pages/Team'
 import Authors from './pages/Authors'
+import Roles from './pages/Roles'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('admin_token')
-  const user = localStorage.getItem('admin_user')
-  if (!token || !user) return <Navigate to="/login" replace />
-  try {
-    const parsed = JSON.parse(user)
-    if (parsed.role !== 'admin') return <Navigate to="/login" replace />
-  } catch {
-    return <Navigate to="/login" replace />
-  }
+  if (!token) return <Navigate to="/login" replace />
   return <>{children}</>
 }
 
@@ -45,6 +39,7 @@ export default function App() {
         <Route path="news" element={<News />} />
         <Route path="team" element={<Team />} />
         <Route path="authors" element={<Authors />} />
+        <Route path="roles" element={<Roles />} />
       </Route>
     </Routes>
   )

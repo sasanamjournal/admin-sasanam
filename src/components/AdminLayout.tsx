@@ -1,5 +1,6 @@
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { useState, useEffect } from 'react'
+import { usePermissions } from '../hooks/usePermissions'
 import {
   HiOutlineHome,
   HiOutlineUsers,
@@ -13,25 +14,35 @@ import {
   HiOutlineLogout,
   HiOutlineMenu,
   HiOutlineX,
+  HiOutlineKey,
 } from 'react-icons/hi'
 
+// permission required to see each nav item
 const navItems = [
-  { to: '/', icon: HiOutlineHome, label: 'Dashboard', end: true },
-  { to: '/users', icon: HiOutlineUsers, label: 'Users' },
-  { to: '/payments/subscriptions', icon: HiOutlineCreditCard, label: 'Subscriptions' },
-  { to: '/payments/donations', icon: HiOutlineGift, label: 'Donation Payments' },
-  { to: '/payments/failed', icon: HiOutlineExclamationCircle, label: 'Failed Payments' },
-  { to: '/donation-list', icon: HiOutlineHeart, label: 'Donation List' },
-  { to: '/news', icon: HiOutlineNewspaper, label: 'News' },
-  { to: '/team', icon: HiOutlineUserGroup, label: 'Team' },
-  { to: '/authors', icon: HiOutlinePencil, label: 'Authors' },
+  { to: '/', icon: HiOutlineHome, label: 'Dashboard', end: true, permission: 'dashboard.view' },
+  { to: '/users', icon: HiOutlineUsers, label: 'Users', permission: 'users.view' },
+  { to: '/payments/subscriptions', icon: HiOutlineCreditCard, label: 'Subscriptions', permission: 'payments.view' },
+  { to: '/payments/donations', icon: HiOutlineGift, label: 'Donation Payments', permission: 'payments.view' },
+  { to: '/payments/failed', icon: HiOutlineExclamationCircle, label: 'Failed Payments', permission: 'payments.view' },
+  { to: '/donation-list', icon: HiOutlineHeart, label: 'Donation List', permission: 'donations.view' },
+  { to: '/news', icon: HiOutlineNewspaper, label: 'News', permission: 'news.view' },
+  { to: '/team', icon: HiOutlineUserGroup, label: 'Team', permission: 'team.view' },
+  { to: '/authors', icon: HiOutlinePencil, label: 'Authors', permission: 'authors.view' },
+  { to: '/roles', icon: HiOutlineKey, label: 'Roles & Permissions', permission: 'users.view' },
 ]
+
+const ROLE_BADGE: Record<string, { label: string; color: string }> = {
+  mentor: { label: 'Mentor', color: 'bg-blue-500' },
+  admin: { label: 'Admin', color: 'bg-purple-500' },
+  super_admin: { label: 'Super Admin', color: 'bg-red-500' },
+}
 
 export default function AdminLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const { can, role, isLoading } = usePermissions()
 
   useEffect(() => { setMounted(true) }, [])
   useEffect(() => { setSidebarOpen(false) }, [location.pathname])
@@ -39,6 +50,10 @@ export default function AdminLayout() {
   const user = (() => {
     try { return JSON.parse(localStorage.getItem('admin_user') || '{}') } catch { return {} }
   })()
+
+  // While permissions are loading, show all nav items to avoid flash of empty sidebar
+  const visibleNavItems = isLoading ? navItems : navItems.filter((item) => can(item.permission))
+  const badge = ROLE_BADGE[role] || null
 
   const handleLogout = () => {
     localStorage.removeItem('admin_token')
@@ -61,7 +76,7 @@ export default function AdminLayout() {
 
       {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map((item, i) => (
+        {visibleNavItems.map((item, i) => (
           <NavLink
             key={item.to}
             to={item.to}
@@ -91,6 +106,11 @@ export default function AdminLayout() {
           <div className="min-w-0 flex-1">
             <p className="text-sm font-bold text-[#4A3B32] truncate capitalize">{user.fullName || 'Admin'}</p>
             <p className="text-[11px] text-[#6A5A4A] truncate">{user.email}</p>
+            {badge && (
+              <span className={`inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white ${badge.color}`}>
+                {badge.label}
+              </span>
+            )}
           </div>
         </div>
         <button

@@ -4,6 +4,14 @@ import api from './axios'
 export const loginAdmin = (email: string, password: string) =>
   api.post('/auth/login', { email, password })
 
+// Permissions
+export const getMyPermissions = () => api.get('/admin/me/permissions')
+
+// Roles
+export const getRoles = () => api.get('/admin/roles')
+export const updateRole = (id: string, data: object) =>
+  api.put(`/admin/roles/${id}`, data)
+
 // Dashboard
 export const getDashboard = () => api.get('/admin/dashboard')
 
