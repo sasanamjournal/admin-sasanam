@@ -4,6 +4,7 @@ import { toast } from 'react-toastify'
 import { getBooks, createBook, updateBook, deleteBook, getSections } from '../api/endpoints'
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineFilter } from 'react-icons/hi'
 import { CardGridSkeleton } from '../components/Skeletons'
+import ImageCropper from '../components/ImageCropper'
 
 interface BookForm {
   bookName: string
@@ -21,6 +22,8 @@ export default function BooksPage() {
   const [form, setForm] = useState<BookForm>(emptyForm)
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [coverImage, setCoverImage] = useState<File | null>(null)
+  const [coverPreview, setCoverPreview] = useState<string | null>(null)
+  const [cropSource, setCropSource] = useState<string | null>(null)
   const [page, setPage] = useState(1)
   const [filterSection, setFilterSection] = useState('')
   const [search, setSearch] = useState('')
@@ -63,8 +66,28 @@ export default function BooksPage() {
 
   const resetForm = () => {
     setForm(emptyForm); setShowForm(false); setEditId(null)
-    setPdfFile(null); setCoverImage(null)
+    setPdfFile(null); setCoverImage(null); setCoverPreview(null); setCropSource(null)
     if (pdfRef.current) pdfRef.current.value = ''
+    if (coverRef.current) coverRef.current.value = ''
+  }
+
+  const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setCropSource(url)
+  }
+
+  const handleCropDone = (croppedFile: File) => {
+    setCoverImage(croppedFile)
+    setCoverPreview(URL.createObjectURL(croppedFile))
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
+  }
+
+  const handleCropCancel = () => {
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
     if (coverRef.current) coverRef.current.value = ''
   }
 
@@ -218,12 +241,22 @@ export default function BooksPage() {
                   <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">
                     Cover {editId && '(optional)'}
                   </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
-                    <HiOutlinePhotograph className="w-4 h-4 text-primary/60 shrink-0" />
-                    <span className="text-xs text-muted truncate">{coverImage ? coverImage.name : 'Choose image'}</span>
-                    <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
-                      onChange={(e) => setCoverImage(e.target.files?.[0] || null)} />
-                  </label>
+                  {coverPreview ? (
+                    <div className="relative w-full h-20 rounded-lg overflow-hidden border border-primary/20">
+                      <img src={coverPreview} alt="Cover preview" className="w-full h-full object-cover" />
+                      <button type="button" onClick={() => { setCoverImage(null); setCoverPreview(null); if (coverRef.current) coverRef.current.value = '' }}
+                        className="absolute top-1 right-1 p-0.5 rounded-full bg-black/50 text-white hover:bg-black/70 transition-colors">
+                        <HiOutlineX className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
+                      <HiOutlinePhotograph className="w-4 h-4 text-primary/60 shrink-0" />
+                      <span className="text-xs text-muted truncate">Choose image</span>
+                      <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                        onChange={handleCoverSelect} />
+                    </label>
+                  )}
                 </div>
               </div>
 
@@ -333,6 +366,16 @@ export default function BooksPage() {
             </div>
           )}
         </>
+      )}
+      {/* Image Cropper Modal */}
+      {cropSource && (
+        <ImageCropper
+          image={cropSource}
+          onCropDone={handleCropDone}
+          onCancel={handleCropCancel}
+          aspect={3 / 4}
+          fileName="cover.jpg"
+        />
       )}
     </div>
   )
