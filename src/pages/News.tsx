@@ -279,6 +279,11 @@ export default function News() {
           </>
         )}
       </div>
+
+      {/* Image Cropper */}
+      {cropSource && (
+        <ImageCropper image={cropSource} onCropDone={handleCropDone} onCancel={handleCropCancel} aspect={16 / 9} fileName="news-image.jpg" />
+      )}
     </div>
   )
 }
