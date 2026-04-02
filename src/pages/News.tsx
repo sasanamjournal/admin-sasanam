@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getNews, createNews, updateNews, deleteNews } from '../api/endpoints'
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX } from 'react-icons/hi'
+import { TableSkeleton } from '../components/Skeletons'
 
 interface NewsForm {
   title: string
@@ -156,9 +157,7 @@ export default function News() {
       {/* Table */}
       <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center h-40">
-            <div className="h-6 w-6 border-2 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton rows={6} cols={5} />
         ) : (
           <>
             <div className="overflow-x-auto">

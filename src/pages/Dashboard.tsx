@@ -17,6 +17,7 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell, Legend,
 } from 'recharts'
+import { DashboardSkeleton } from '../components/Skeletons'
 
 const CHART_COLORS = ['#8B4513', '#a0522d', '#c4875b', '#d4a574', '#e8c9a0', '#6B3410', '#4A3B32', '#b8860b']
 
@@ -50,16 +51,7 @@ export default function Dashboard() {
   const [loaded, setLoaded] = useState(false)
   useEffect(() => { if (!isLoading && data) setTimeout(() => setLoaded(true), 100) }, [isLoading, data])
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 border-3 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm font-medium text-[#6A5A4A] animate-pulse">Loading dashboard...</p>
-        </div>
-      </div>
-    )
-  }
+  if (isLoading) return <DashboardSkeleton />
 
   const stats = [
     { label: 'Total Users', value: data?.users?.total || 0, icon: HiOutlineUsers, color: 'from-blue-500 to-blue-600', bg: 'bg-blue-50', text: 'text-blue-600' },

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { getFailedPayments } from '../api/endpoints'
+import { FailedPaymentsSkeleton } from '../components/Skeletons'
 
 export default function FailedPayments() {
   const [page, setPage] = useState(1)
@@ -86,9 +87,7 @@ export default function FailedPayments() {
       </div>
 
       {isLoading ? (
-        <div className="flex items-center justify-center h-40">
-          <div className="h-6 w-6 border-2 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
-        </div>
+        <FailedPaymentsSkeleton />
       ) : (
         <>
           {renderTable('Failed Subscription Payments', data?.subscriptionFailures || [], 'sub')}

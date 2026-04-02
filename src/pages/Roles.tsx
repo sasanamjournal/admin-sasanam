@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getRoles, updateRole } from '../api/endpoints'
 import { usePermissions } from '../hooks/usePermissions'
+import { RolesSkeleton } from '../components/Skeletons'
 import { HiOutlineShieldCheck } from 'react-icons/hi'
 
 const ROLE_COLORS: Record<string, string> = {
@@ -122,13 +123,7 @@ export default function Roles() {
   const roleOrder = ['user', 'mentor', 'admin', 'super_admin']
   const sortedRoles = roles ? [...roles].sort((a: any, b: any) => roleOrder.indexOf(a.name) - roleOrder.indexOf(b.name)) : []
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="h-8 w-8 border-3 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (isLoading) return <RolesSkeleton />
 
   return (
     <div>

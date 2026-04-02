@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getAuthors, createAuthor, updateAuthor, deleteAuthor } from '../api/endpoints'
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX } from 'react-icons/hi'
+import { CardGridSkeleton } from '../components/Skeletons'
 
 interface AuthorForm {
   name: string
@@ -110,9 +111,7 @@ export default function Authors() {
 
       {/* Cards Grid */}
       {isLoading ? (
-        <div className="flex items-center justify-center h-40">
-          <div className="h-6 w-6 border-2 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
-        </div>
+        <CardGridSkeleton count={6} cols={3} />
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {data?.map((author: any) => (

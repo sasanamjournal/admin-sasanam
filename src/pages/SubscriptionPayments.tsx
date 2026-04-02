@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getSubscriptionPayments, refundPayment } from '../api/endpoints'
 import { HiOutlineSearch, HiOutlineRefresh } from 'react-icons/hi'
+import { TableSkeleton } from '../components/Skeletons'
 
 const statusBadge = (status: string) => {
   const map: Record<string, string> = {
@@ -70,9 +71,7 @@ export default function SubscriptionPayments() {
       {/* Table */}
       <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center h-40">
-            <div className="h-6 w-6 border-2 border-[#8B4513] border-t-transparent rounded-full animate-spin" />
-          </div>
+          <TableSkeleton rows={8} cols={6} />
         ) : (
           <>
             <div className="overflow-x-auto">
