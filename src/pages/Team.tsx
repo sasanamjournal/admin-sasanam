@@ -1,24 +1,30 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getTeam, createTeamMember, updateTeamMember, deleteTeamMember } from '../api/endpoints'
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX } from 'react-icons/hi'
+import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlinePhotograph } from 'react-icons/hi'
 import { CardGridSkeleton } from '../components/Skeletons'
+import ImageCropper from '../components/ImageCropper'
+
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 
 interface TeamForm {
   name: string
   role: string
-  photo: string
   bio: string
   order: number
 }
 
-const emptyForm: TeamForm = { name: '', role: '', photo: '', bio: '', order: 0 }
+const emptyForm: TeamForm = { name: '', role: '', bio: '', order: 0 }
 
 export default function Team() {
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState<TeamForm>(emptyForm)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [cropSource, setCropSource] = useState<string | null>(null)
+  const photoRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
 
   const { data, isLoading } = useQuery({
@@ -26,14 +32,24 @@ export default function Team() {
     queryFn: () => getTeam().then((r) => r.data.data),
   })
 
+  const buildFormData = () => {
+    const fd = new FormData()
+    fd.append('name', form.name)
+    fd.append('role', form.role)
+    fd.append('bio', form.bio)
+    fd.append('order', String(form.order))
+    if (photoFile) fd.append('photo', photoFile)
+    return fd
+  }
+
   const createMut = useMutation({
-    mutationFn: (d: TeamForm) => createTeamMember(d),
+    mutationFn: () => createTeamMember(buildFormData()),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['team'] }); toast.success('Member added'); resetForm() },
     onError: () => toast.error('Create failed'),
   })
 
   const updateMut = useMutation({
-    mutationFn: ({ id, d }: { id: string; d: TeamForm }) => updateTeamMember(id, d),
+    mutationFn: (id: string) => updateTeamMember(id, buildFormData()),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['team'] }); toast.success('Member updated'); resetForm() },
     onError: () => toast.error('Update failed'),
   })
@@ -44,20 +60,47 @@ export default function Team() {
     onError: () => toast.error('Delete failed'),
   })
 
-  const resetForm = () => { setForm(emptyForm); setShowForm(false); setEditId(null) }
+  const resetForm = () => {
+    setForm(emptyForm); setShowForm(false); setEditId(null)
+    setPhotoFile(null); setPhotoPreview(null); setCropSource(null)
+    if (photoRef.current) photoRef.current.value = ''
+  }
 
   const handleEdit = (item: any) => {
-    setForm({ name: item.name, role: item.role, photo: item.photo || '', bio: item.bio || '', order: item.order || 0 })
+    setForm({ name: item.name, role: item.role, bio: item.bio || '', order: item.order || 0 })
     setEditId(item._id)
+    setPhotoFile(null)
+    setPhotoPreview(item.photo ? `${API}/uploads/${item.photo}?w=360` : null)
     setShowForm(true)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.name || !form.role) return toast.error('Name and role required')
-    if (editId) updateMut.mutate({ id: editId, d: form })
-    else createMut.mutate(form)
+    if (editId) updateMut.mutate(editId)
+    else createMut.mutate()
   }
+
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCropSource(URL.createObjectURL(file))
+  }
+
+  const handleCropDone = (croppedFile: File) => {
+    setPhotoFile(croppedFile)
+    setPhotoPreview(URL.createObjectURL(croppedFile))
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
+  }
+
+  const handleCropCancel = () => {
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
+    if (photoRef.current) photoRef.current.value = ''
+  }
+
+  const imgUrl = (photo: string, w = 360) => photo ? `${API}/uploads/${photo}?w=${w}` : ''
 
   return (
     <div>
@@ -93,10 +136,22 @@ export default function Team() {
                     className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required />
                 </div>
               </div>
+              {/* Photo upload with cropper */}
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Photo URL</label>
-                <input value={form.photo} onChange={(e) => setForm({ ...form, photo: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" />
+                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Photo</label>
+                {photoPreview ? (
+                  <div className="relative w-20 h-24 rounded-xl overflow-hidden border border-primary/20">
+                    <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); if (photoRef.current) photoRef.current.value = '' }}
+                      className="absolute top-1 right-1 p-0.5 rounded-full bg-black/50 text-white hover:bg-black/70"><HiOutlineX className="w-3 h-3" /></button>
+                  </div>
+                ) : (
+                  <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
+                    <HiOutlinePhotograph className="w-5 h-5 text-primary/60" />
+                    <span className="text-sm text-muted">Choose photo</span>
+                    <input ref={photoRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoSelect} />
+                  </label>
+                )}
               </div>
               <div>
                 <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Bio</label>
@@ -117,6 +172,11 @@ export default function Team() {
         </div>
       )}
 
+      {/* Image Cropper */}
+      {cropSource && (
+        <ImageCropper image={cropSource} onCropDone={handleCropDone} onCancel={handleCropCancel} aspect={3 / 4} fileName="photo.jpg" />
+      )}
+
       {/* Cards Grid */}
       {isLoading ? (
         <CardGridSkeleton count={6} cols={3} />
@@ -127,7 +187,7 @@ export default function Team() {
               <div className="flex items-start gap-4">
                 <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl font-black uppercase flex-shrink-0 overflow-hidden">
                   {member.photo ? (
-                    <img src={member.photo} alt={member.name} className="h-full w-full object-cover" />
+                    <img src={imgUrl(member.photo)} alt={member.name} className="h-full w-full object-cover" />
                   ) : (
                     member.name.charAt(0)
                   )}

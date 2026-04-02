@@ -56,21 +56,21 @@ export const deleteDonation = (id: string) =>
 export const getNews = (params: Record<string, string | number>) =>
   api.get('/admin/news', { params })
 
-export const createNews = (data: object) =>
-  api.post('/admin/news', data)
+export const createNews = (data: FormData) =>
+  api.post('/admin/news', data, { headers: { 'Content-Type': 'multipart/form-data' } })
 
-export const updateNews = (id: string, data: object) =>
-  api.put(`/admin/news/${id}`, data)
+export const updateNews = (id: string, data: FormData) =>
+  api.put(`/admin/news/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
 
 export const deleteNews = (id: string) =>
   api.delete(`/admin/news/${id}`)
 
 // Team
 export const getTeam = () => api.get('/admin/team')
-export const createTeamMember = (data: object) =>
-  api.post('/admin/team', data)
-export const updateTeamMember = (id: string, data: object) =>
-  api.put(`/admin/team/${id}`, data)
+export const createTeamMember = (data: FormData) =>
+  api.post('/admin/team', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateTeamMember = (id: string, data: FormData) =>
+  api.put(`/admin/team/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
 export const deleteTeamMember = (id: string) =>
   api.delete(`/admin/team/${id}`)
 
@@ -95,9 +95,9 @@ export const deleteBook = (id: string) =>
 
 // Authors
 export const getAuthors = () => api.get('/admin/authors')
-export const createAuthor = (data: object) =>
-  api.post('/admin/authors', data)
-export const updateAuthor = (id: string, data: object) =>
-  api.put(`/admin/authors/${id}`, data)
+export const createAuthor = (data: FormData) =>
+  api.post('/admin/authors', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateAuthor = (id: string, data: FormData) =>
+  api.put(`/admin/authors/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
 export const deleteAuthor = (id: string) =>
   api.delete(`/admin/authors/${id}`)
