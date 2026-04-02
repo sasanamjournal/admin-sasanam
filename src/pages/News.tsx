@@ -25,6 +25,7 @@ export default function News() {
   const [form, setForm] = useState<NewsForm>(emptyForm)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageRemoved, setImageRemoved] = useState(false)
   const [cropSource, setCropSource] = useState<string | null>(null)
   const imageRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
@@ -43,6 +44,7 @@ export default function News() {
     fd.append('isPublished', String(form.isPublished))
     fd.append('author', form.author)
     if (imageFile) fd.append('image', imageFile)
+    if (imageRemoved && !imageFile) fd.append('removeImage', 'true')
     return fd
   }
 
@@ -86,6 +88,7 @@ export default function News() {
     setEditId(null)
     setImageFile(null)
     setImagePreview(null)
+    setImageRemoved(false)
     setCropSource(null)
     if (imageRef.current) imageRef.current.value = ''
   }
@@ -187,7 +190,7 @@ export default function News() {
                 {imagePreview ? (
                   <div className="relative w-full h-28 rounded-xl overflow-hidden border border-primary/20">
                     <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); if (imageRef.current) imageRef.current.value = '' }}
+                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); setImageRemoved(true); if (imageRef.current) imageRef.current.value = '' }}
                       className="absolute top-1 right-1 p-0.5 rounded-full bg-black/50 text-white hover:bg-black/70"><HiOutlineX className="w-3 h-3" /></button>
                   </div>
                 ) : (

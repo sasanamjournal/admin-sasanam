@@ -23,6 +23,7 @@ export default function Authors() {
   const [form, setForm] = useState<AuthorForm>(emptyForm)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [photoRemoved, setPhotoRemoved] = useState(false)
   const [cropSource, setCropSource] = useState<string | null>(null)
   const photoRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
@@ -39,6 +40,7 @@ export default function Authors() {
     fd.append('description', form.description)
     fd.append('order', String(form.order))
     if (photoFile) fd.append('photo', photoFile)
+    if (photoRemoved && !photoFile) fd.append('removePhoto', 'true')
     return fd
   }
 
@@ -62,7 +64,7 @@ export default function Authors() {
 
   const resetForm = () => {
     setForm(emptyForm); setShowForm(false); setEditId(null)
-    setPhotoFile(null); setPhotoPreview(null); setCropSource(null)
+    setPhotoFile(null); setPhotoPreview(null); setPhotoRemoved(false); setCropSource(null)
     if (photoRef.current) photoRef.current.value = ''
   }
 
@@ -144,7 +146,7 @@ export default function Authors() {
                 {photoPreview ? (
                   <div className="relative w-20 h-24 rounded-xl overflow-hidden border border-primary/20">
                     <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
-                    <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); if (photoRef.current) photoRef.current.value = '' }}
+                    <button type="button" onClick={() => { setPhotoFile(null); setPhotoPreview(null); setPhotoRemoved(true); if (photoRef.current) photoRef.current.value = '' }}
                       className="absolute top-1 right-1 p-0.5 rounded-full bg-black/50 text-white hover:bg-black/70"><HiOutlineX className="w-3 h-3" /></button>
                   </div>
                 ) : (
