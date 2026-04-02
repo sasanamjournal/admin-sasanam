@@ -11,10 +11,11 @@ const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 interface AuthorForm {
   name: string
   bookName: string
+  description: string
   order: number
 }
 
-const emptyForm: AuthorForm = { name: '', bookName: '', order: 0 }
+const emptyForm: AuthorForm = { name: '', bookName: '', description: '', order: 0 }
 
 export default function Authors() {
   const [showForm, setShowForm] = useState(false)
@@ -35,6 +36,7 @@ export default function Authors() {
     const fd = new FormData()
     fd.append('name', form.name)
     fd.append('bookName', form.bookName)
+    fd.append('description', form.description)
     fd.append('order', String(form.order))
     if (photoFile) fd.append('photo', photoFile)
     return fd
@@ -65,7 +67,7 @@ export default function Authors() {
   }
 
   const handleEdit = (item: any) => {
-    setForm({ name: item.name, bookName: item.bookName, order: item.order || 0 })
+    setForm({ name: item.name, bookName: item.bookName, description: item.description || '', order: item.order || 0 })
     setEditId(item._id)
     setPhotoFile(null)
     setPhotoPreview(item.photo ? imgUrl(item.photo) : null)
@@ -152,6 +154,12 @@ export default function Authors() {
                     <input ref={photoRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handlePhotoSelect} />
                   </label>
                 )}
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Description</label>
+                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} maxLength={500}
+                  placeholder="Brief info shown on hover"
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30 resize-none" />
               </div>
               <div>
                 <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Display Order</label>
