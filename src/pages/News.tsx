@@ -1,27 +1,50 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getNews, createNews, updateNews, deleteNews } from '../api/endpoints'
-import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX } from 'react-icons/hi'
+import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlinePhotograph } from 'react-icons/hi'
 import { TableSkeleton } from '../components/Skeletons'
+import ImageCropper from '../components/ImageCropper'
+
+const API = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000'
 
 interface NewsForm {
   title: string
   content: string
   category: string
-  imageUrl: string
   isPublished: boolean
   author: string
 }
 
-const emptyForm: NewsForm = { title: '', content: '', category: 'general', imageUrl: '', isPublished: true, author: 'admin' }
+const emptyForm: NewsForm = { title: '', content: '', category: 'general', isPublished: true, author: 'admin' }
 
 export default function News() {
   const [page, setPage] = useState(1)
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState<NewsForm>(emptyForm)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [cropSource, setCropSource] = useState<string | null>(null)
+  const imageRef = useRef<HTMLInputElement>(null)
   const queryClient = useQueryClient()
+
+  const imgUrl = (photo: string) => {
+    if (!photo) return ''
+    if (photo.startsWith('http')) return photo
+    return `${API}/uploads/${photo}?w=640`
+  }
+
+  const buildFormData = () => {
+    const fd = new FormData()
+    fd.append('title', form.title)
+    fd.append('content', form.content)
+    fd.append('category', form.category)
+    fd.append('isPublished', String(form.isPublished))
+    fd.append('author', form.author)
+    if (imageFile) fd.append('image', imageFile)
+    return fd
+  }
 
   const { data, isLoading } = useQuery({
     queryKey: ['news', page],
@@ -29,7 +52,7 @@ export default function News() {
   })
 
   const createMut = useMutation({
-    mutationFn: (data: NewsForm) => createNews(data),
+    mutationFn: () => createNews(buildFormData()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news'] })
       toast.success('News created')
@@ -39,7 +62,7 @@ export default function News() {
   })
 
   const updateMut = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: NewsForm }) => updateNews(id, data),
+    mutationFn: (id: string) => updateNews(id, buildFormData()),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['news'] })
       toast.success('News updated')
@@ -61,6 +84,10 @@ export default function News() {
     setForm(emptyForm)
     setShowForm(false)
     setEditId(null)
+    setImageFile(null)
+    setImagePreview(null)
+    setCropSource(null)
+    if (imageRef.current) imageRef.current.value = ''
   }
 
   const handleEdit = (item: any) => {
@@ -68,11 +95,12 @@ export default function News() {
       title: item.title,
       content: item.content,
       category: item.category || 'general',
-      imageUrl: item.imageUrl || '',
       isPublished: item.isPublished,
       author: item.author || 'admin',
     })
     setEditId(item._id)
+    setImageFile(null)
+    setImagePreview(item.imageUrl ? imgUrl(item.imageUrl) : null)
     setShowForm(true)
   }
 
@@ -80,10 +108,29 @@ export default function News() {
     e.preventDefault()
     if (!form.title || !form.content) return toast.error('Title and content required')
     if (editId) {
-      updateMut.mutate({ id: editId, data: form })
+      updateMut.mutate(editId)
     } else {
-      createMut.mutate(form)
+      createMut.mutate()
     }
+  }
+
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setCropSource(URL.createObjectURL(file))
+  }
+
+  const handleCropDone = (croppedFile: File) => {
+    setImageFile(croppedFile)
+    setImagePreview(URL.createObjectURL(croppedFile))
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
+  }
+
+  const handleCropCancel = () => {
+    if (cropSource) URL.revokeObjectURL(cropSource)
+    setCropSource(null)
+    if (imageRef.current) imageRef.current.value = ''
   }
 
   return (
@@ -136,9 +183,20 @@ export default function News() {
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Image URL</label>
-                <input value={form.imageUrl} onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" />
+                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Image</label>
+                {imagePreview ? (
+                  <div className="relative w-full h-28 rounded-xl overflow-hidden border border-primary/20">
+                    <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => { setImageFile(null); setImagePreview(null); if (imageRef.current) imageRef.current.value = '' }}
+                      className="absolute top-1 right-1 p-0.5 rounded-full bg-black/50 text-white hover:bg-black/70"><HiOutlineX className="w-3 h-3" /></button>
+                  </div>
+                ) : (
+                  <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
+                    <HiOutlinePhotograph className="w-5 h-5 text-primary/60" />
+                    <span className="text-sm text-muted">Choose image</span>
+                    <input ref={imageRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={handleImageSelect} />
+                  </label>
+                )}
               </div>
               <label className="flex items-center gap-2 cursor-pointer">
                 <input type="checkbox" checked={form.isPublished} onChange={(e) => setForm({ ...form, isPublished: e.target.checked })}
