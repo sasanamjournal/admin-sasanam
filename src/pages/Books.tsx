@@ -1,0 +1,312 @@
+import { useState, useRef } from 'react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'react-toastify'
+import { getBooks, createBook, updateBook, deleteBook, getSections } from '../api/endpoints'
+import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineFilter } from 'react-icons/hi'
+import { CardGridSkeleton } from '../components/Skeletons'
+
+interface BookForm {
+  bookName: string
+  authorName: string
+  sectionId: string
+  description: string
+}
+
+const emptyForm: BookForm = { bookName: '', authorName: '', sectionId: '', description: '' }
+
+export default function BooksPage() {
+  const [showForm, setShowForm] = useState(false)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [form, setForm] = useState<BookForm>(emptyForm)
+  const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [coverImage, setCoverImage] = useState<File | null>(null)
+  const [page, setPage] = useState(1)
+  const [filterSection, setFilterSection] = useState('')
+  const [search, setSearch] = useState('')
+  const pdfRef = useRef<HTMLInputElement>(null)
+  const coverRef = useRef<HTMLInputElement>(null)
+  const queryClient = useQueryClient()
+
+  const { data: sections } = useQuery({
+    queryKey: ['sections'],
+    queryFn: () => getSections().then((r) => r.data.data),
+  })
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['books', page, filterSection, search],
+    queryFn: () => {
+      const params: Record<string, string | number> = { page, limit: 20 }
+      if (filterSection) params.sectionId = filterSection
+      if (search) params.search = search
+      return getBooks(params).then((r) => r.data.data)
+    },
+  })
+
+  const createMut = useMutation({
+    mutationFn: (fd: FormData) => createBook(fd),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['books'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Book added'); resetForm() },
+    onError: (err: any) => toast.error(err?.response?.data?.error || 'Create failed'),
+  })
+
+  const updateMut = useMutation({
+    mutationFn: ({ id, fd }: { id: string; fd: FormData }) => updateBook(id, fd),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['books'] }); toast.success('Book updated'); resetForm() },
+    onError: (err: any) => toast.error(err?.response?.data?.error || 'Update failed'),
+  })
+
+  const deleteMut = useMutation({
+    mutationFn: deleteBook,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['books'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Book deleted') },
+    onError: (err: any) => toast.error(err?.response?.data?.error || 'Delete failed'),
+  })
+
+  const resetForm = () => {
+    setForm(emptyForm); setShowForm(false); setEditId(null)
+    setPdfFile(null); setCoverImage(null)
+    if (pdfRef.current) pdfRef.current.value = ''
+    if (coverRef.current) coverRef.current.value = ''
+  }
+
+  const handleEdit = (item: any) => {
+    setForm({
+      bookName: item.bookName,
+      authorName: item.authorName,
+      sectionId: item.sectionId?._id || item.sectionId || '',
+      description: item.description || '',
+    })
+    setEditId(item._id)
+    setPdfFile(null)
+    setCoverImage(null)
+    setShowForm(true)
+  }
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.bookName || !form.authorName || !form.sectionId) return toast.error('Book name, author, and section are required')
+
+    const fd = new FormData()
+    fd.append('bookName', form.bookName)
+    fd.append('authorName', form.authorName)
+    fd.append('sectionId', form.sectionId)
+    fd.append('description', form.description)
+    if (pdfFile) fd.append('pdfFile', pdfFile)
+    if (coverImage) fd.append('coverImage', coverImage)
+
+    if (editId) updateMut.mutate({ id: editId, fd })
+    else createMut.mutate(fd)
+  }
+
+  const getSectionName = (book: any) => {
+    if (book.sectionId && typeof book.sectionId === 'object') return book.sectionId.name
+    const s = sections?.find((s: any) => s._id === book.sectionId)
+    return s?.name || 'Unknown'
+  }
+
+  return (
+    <div>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Books</h1>
+          <p className="text-sm text-[#6A5A4A] mt-1">
+            Manage books &amp; PDFs {data ? `(${data.total} total)` : ''}
+          </p>
+        </div>
+        <button onClick={() => { resetForm(); setShowForm(true) }}
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B4513] text-white text-sm font-bold shadow-md hover:bg-[#a0522d] transition-colors">
+          <HiOutlinePlus className="w-4 h-4" /> Add Book
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-6">
+        <div className="relative flex-1">
+          <input
+            type="text"
+            placeholder="Search books..."
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1) }}
+            className="w-full px-4 py-2.5 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30"
+          />
+        </div>
+        <div className="relative">
+          <select
+            value={filterSection}
+            onChange={(e) => { setFilterSection(e.target.value); setPage(1) }}
+            className="appearance-none px-4 py-2.5 pr-10 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30"
+          >
+            <option value="">All Sections</option>
+            {sections?.map((s: any) => (
+              <option key={s._id} value={s._id}>{s.name}</option>
+            ))}
+          </select>
+          <HiOutlineFilter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B4513]/40 pointer-events-none" />
+        </div>
+      </div>
+
+      {/* Form Modal */}
+      {showForm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 overflow-y-auto">
+          <div className="bg-[#fdfaf2] rounded-2xl w-full max-w-lg shadow-2xl border border-white/30 my-8">
+            <div className="flex items-center justify-between p-5 border-b border-[#8B4513]/10">
+              <h2 className="text-lg font-bold text-[#4A3B32]">{editId ? 'Edit Book' : 'Add Book'}</h2>
+              <button onClick={resetForm} className="p-1 text-[#6A5A4A] hover:text-[#8B4513]"><HiOutlineX className="w-5 h-5" /></button>
+            </div>
+            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Book Name</label>
+                <input value={form.bookName} onChange={(e) => setForm({ ...form, bookName: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Author Name</label>
+                <input value={form.authorName} onChange={(e) => setForm({ ...form, authorName: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Section</label>
+                <select value={form.sectionId} onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required>
+                  <option value="">Select a section</option>
+                  {sections?.map((s: any) => (
+                    <option key={s._id} value={s._id}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Description</label>
+                <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
+                  rows={3} maxLength={500}
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30 resize-none" />
+              </div>
+
+              {/* PDF Upload */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">
+                  PDF File {editId && '(leave empty to keep current)'}
+                </label>
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
+                  <HiOutlineDocumentText className="w-5 h-5 text-[#8B4513]/60" />
+                  <span className="text-sm text-[#6A5A4A]">{pdfFile ? pdfFile.name : 'Choose PDF file (max 50MB)'}</span>
+                  <input ref={pdfRef} type="file" accept=".pdf" className="hidden"
+                    onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
+                </label>
+              </div>
+
+              {/* Cover Image Upload */}
+              <div>
+                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">
+                  Cover Image {editId && '(leave empty to keep current)'}
+                </label>
+                <label className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
+                  <HiOutlinePhotograph className="w-5 h-5 text-[#8B4513]/60" />
+                  <span className="text-sm text-[#6A5A4A]">{coverImage ? coverImage.name : 'Choose cover image (JPEG/PNG/WebP)'}</span>
+                  <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
+                    onChange={(e) => setCoverImage(e.target.files?.[0] || null)} />
+                </label>
+              </div>
+
+              <button type="submit" disabled={createMut.isPending || updateMut.isPending}
+                className="w-full py-3 rounded-xl bg-[#8B4513] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#a0522d] transition-colors disabled:opacity-50">
+                {(createMut.isPending || updateMut.isPending) ? 'Uploading...' : editId ? 'Update' : 'Create'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Books Table */}
+      {isLoading ? (
+        <CardGridSkeleton count={6} cols={1} />
+      ) : (
+        <>
+          <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-[#8B4513]/10">
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Book</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Author</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Section</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">PDF</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Cover</th>
+                    <th className="text-right px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data?.books?.map((book: any) => (
+                    <tr key={book._id} className="border-b border-[#8B4513]/5 hover:bg-[#8B4513]/3 transition-colors">
+                      <td className="px-5 py-3">
+                        <p className="font-bold text-[#4A3B32]">{book.bookName}</p>
+                        {book.description && <p className="text-xs text-[#6A5A4A] mt-0.5 line-clamp-1">{book.description}</p>}
+                      </td>
+                      <td className="px-5 py-3 text-[#6A5A4A]">{book.authorName}</td>
+                      <td className="px-5 py-3">
+                        <span className="inline-block px-2.5 py-1 rounded-lg bg-[#8B4513]/8 text-[#8B4513] text-xs font-bold">
+                          {getSectionName(book)}
+                        </span>
+                      </td>
+                      <td className="px-5 py-3">
+                        {book.pdfFile ? (
+                          <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold">
+                            <HiOutlineDocumentText className="w-4 h-4" /> Yes
+                          </span>
+                        ) : (
+                          <span className="text-xs text-[#6A5A4A]/50">None</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3">
+                        {book.coverImage ? (
+                          <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold">
+                            <HiOutlinePhotograph className="w-4 h-4" /> Yes
+                          </span>
+                        ) : (
+                          <span className="text-xs text-[#6A5A4A]/50">None</span>
+                        )}
+                      </td>
+                      <td className="px-5 py-3 text-right">
+                        <div className="flex gap-1 justify-end">
+                          <button onClick={() => handleEdit(book)} className="p-1.5 rounded-lg text-[#8B4513] hover:bg-[#8B4513]/10 transition-colors">
+                            <HiOutlinePencil className="w-4 h-4" />
+                          </button>
+                          <button onClick={() => { if (confirm('Delete this book and its files?')) deleteMut.mutate(book._id) }} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                            <HiOutlineTrash className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {(!data?.books || data.books.length === 0) && (
+              <div className="text-center py-12 text-[#6A5A4A]/60">No books found</div>
+            )}
+          </div>
+
+          {/* Pagination */}
+          {data && data.totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
+                disabled={page <= 1}
+                className="px-4 py-2 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm font-bold text-[#4A3B32] hover:bg-[#8B4513]/5 disabled:opacity-40 transition-colors"
+              >
+                Previous
+              </button>
+              <span className="text-sm font-bold text-[#6A5A4A]">
+                Page {page} of {data.totalPages}
+              </span>
+              <button
+                onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
+                disabled={page >= data.totalPages}
+                className="px-4 py-2 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm font-bold text-[#4A3B32] hover:bg-[#8B4513]/5 disabled:opacity-40 transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      )}
+    </div>
+  )
+}

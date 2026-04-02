@@ -74,6 +74,25 @@ export const updateTeamMember = (id: string, data: object) =>
 export const deleteTeamMember = (id: string) =>
   api.delete(`/admin/team/${id}`)
 
+// Sections (Journal Headers)
+export const getSections = () => api.get('/admin/sections')
+export const createSection = (data: { name: string }) =>
+  api.post('/admin/sections', data)
+export const updateSection = (id: string, data: { name: string }) =>
+  api.put(`/admin/sections/${id}`, data)
+export const deleteSection = (id: string) =>
+  api.delete(`/admin/sections/${id}`)
+
+// Books
+export const getBooks = (params: Record<string, string | number>) =>
+  api.get('/admin/books', { params })
+export const createBook = (data: FormData) =>
+  api.post('/admin/books', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateBook = (id: string, data: FormData) =>
+  api.put(`/admin/books/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const deleteBook = (id: string) =>
+  api.delete(`/admin/books/${id}`)
+
 // Authors
 export const getAuthors = () => api.get('/admin/authors')
 export const createAuthor = (data: object) =>

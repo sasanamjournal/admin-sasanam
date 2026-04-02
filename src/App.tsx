@@ -10,6 +10,8 @@ import DonationList from './pages/DonationList'
 import News from './pages/News'
 import Team from './pages/Team'
 import Authors from './pages/Authors'
+import Sections from './pages/Sections'
+import BooksPage from './pages/Books'
 import Roles from './pages/Roles'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -39,6 +41,8 @@ export default function App() {
         <Route path="news" element={<News />} />
         <Route path="team" element={<Team />} />
         <Route path="authors" element={<Authors />} />
+        <Route path="sections" element={<Sections />} />
+        <Route path="books" element={<BooksPage />} />
         <Route path="roles" element={<Roles />} />
       </Route>
     </Routes>

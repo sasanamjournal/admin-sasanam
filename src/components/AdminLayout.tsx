@@ -15,6 +15,8 @@ import {
   HiOutlineMenu,
   HiOutlineX,
   HiOutlineKey,
+  HiOutlineCollection,
+  HiOutlineBookOpen,
 } from 'react-icons/hi'
 
 // permission required to see each nav item
@@ -28,6 +30,8 @@ const navItems = [
   { to: '/news', icon: HiOutlineNewspaper, label: 'News', permission: 'news.view' },
   { to: '/team', icon: HiOutlineUserGroup, label: 'Team', permission: 'team.view' },
   { to: '/authors', icon: HiOutlinePencil, label: 'Authors', permission: 'authors.view' },
+  { to: '/sections', icon: HiOutlineCollection, label: 'Sections', permission: 'authors.view' },
+  { to: '/books', icon: HiOutlineBookOpen, label: 'Books', permission: 'authors.view' },
   { to: '/roles', icon: HiOutlineKey, label: 'Roles & Permissions', permission: 'users.view' },
 ]
 
