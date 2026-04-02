@@ -109,13 +109,13 @@ export default function BooksPage() {
     <div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Books</h1>
-          <p className="text-sm text-[#6A5A4A] mt-1">
+          <h1 className="text-2xl font-serif font-black text-body">Books</h1>
+          <p className="text-sm text-muted mt-1">
             Manage books &amp; PDFs {data ? `(${data.total} total)` : ''}
           </p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true) }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B4513] text-white text-sm font-bold shadow-md hover:bg-[#a0522d] transition-colors">
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-md hover:bg-primary-light transition-colors">
           <HiOutlinePlus className="w-4 h-4" /> Add Book
         </button>
       </div>
@@ -128,48 +128,48 @@ export default function BooksPage() {
             placeholder="Search books..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
-            className="w-full px-4 py-2.5 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30"
+            className="w-full px-4 py-2.5 rounded-xl bg-card border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30"
           />
         </div>
         <div className="relative">
           <select
             value={filterSection}
             onChange={(e) => { setFilterSection(e.target.value); setPage(1) }}
-            className="appearance-none px-4 py-2.5 pr-10 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30"
+            className="appearance-none px-4 py-2.5 pr-10 rounded-xl bg-card border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30"
           >
             <option value="">All Sections</option>
             {sections?.map((s: any) => (
               <option key={s._id} value={s._id}>{s.name}</option>
             ))}
           </select>
-          <HiOutlineFilter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8B4513]/40 pointer-events-none" />
+          <HiOutlineFilter className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/40 pointer-events-none" />
         </div>
       </div>
 
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 overflow-y-auto py-6 px-4">
-          <div className="bg-[#fdfaf2] rounded-2xl w-full max-w-md shadow-2xl border border-white/30">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[#8B4513]/10 sticky top-0 bg-[#fdfaf2] rounded-t-2xl z-10">
-              <h2 className="text-base font-bold text-[#4A3B32]">{editId ? 'Edit Book' : 'Add Book'}</h2>
-              <button onClick={resetForm} className="p-1 text-[#6A5A4A] hover:text-[#8B4513]"><HiOutlineX className="w-5 h-5" /></button>
+          <div className="bg-card rounded-2xl w-full max-w-md shadow-2xl border border-white/30">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-primary/10 sticky top-0 bg-card rounded-t-2xl z-10">
+              <h2 className="text-base font-bold text-body">{editId ? 'Edit Book' : 'Add Book'}</h2>
+              <button onClick={resetForm} className="p-1 text-muted hover:text-primary"><HiOutlineX className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="px-4 py-3 space-y-3">
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Book Name</label>
+                <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">Book Name</label>
                 <input value={form.bookName} onChange={(e) => setForm({ ...form, bookName: e.target.value })}
-                  className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+                  className="w-full px-3 py-2 rounded-lg bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required />
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Author Name</label>
+                  <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">Author Name</label>
                   <input value={form.authorName} onChange={(e) => setForm({ ...form, authorName: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+                    className="w-full px-3 py-2 rounded-lg bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Section</label>
+                  <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">Section</label>
                   <select value={form.sectionId} onChange={(e) => setForm({ ...form, sectionId: e.target.value })}
-                    className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required>
+                    className="w-full px-3 py-2 rounded-lg bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required>
                     <option value="">Select</option>
                     {sections?.map((s: any) => (
                       <option key={s._id} value={s._id}>{s.name}</option>
@@ -178,10 +178,10 @@ export default function BooksPage() {
                 </div>
               </div>
               <div>
-                <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">Description</label>
+                <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">Description</label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
                   rows={2} maxLength={500}
-                  className="w-full px-3 py-2 rounded-lg bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30 resize-none" />
+                  className="w-full px-3 py-2 rounded-lg bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30 resize-none" />
               </div>
 
               {/* Full Book Toggle */}
@@ -189,13 +189,13 @@ export default function BooksPage() {
                 <button
                   type="button"
                   onClick={() => setForm({ ...form, bookType: form.bookType === 'fullbook' ? 'journal' : 'fullbook' })}
-                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${form.bookType === 'fullbook' ? 'bg-[#8B4513]' : 'bg-[#8B4513]/20'}`}
+                  className={`relative w-10 h-5 rounded-full transition-colors duration-200 shrink-0 ${form.bookType === 'fullbook' ? 'bg-primary' : 'bg-primary/20'}`}
                 >
                   <span className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform duration-200 ${form.bookType === 'fullbook' ? 'translate-x-5' : ''}`} />
                 </button>
                 <div>
-                  <label className="text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Full Book</label>
-                  <p className="text-[10px] text-[#6A5A4A] leading-tight">
+                  <label className="text-2xs font-black uppercase tracking-widest text-primary/70">Full Book</label>
+                  <p className="text-2xs text-muted leading-tight">
                     {form.bookType === 'fullbook' ? 'Sasanam page only' : 'Journal sections'}
                   </p>
                 </div>
@@ -204,23 +204,23 @@ export default function BooksPage() {
               {/* File Uploads - side by side */}
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">
+                  <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">
                     PDF {editId && '(optional)'}
                   </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
-                    <HiOutlineDocumentText className="w-4 h-4 text-[#8B4513]/60 shrink-0" />
-                    <span className="text-xs text-[#6A5A4A] truncate">{pdfFile ? pdfFile.name : 'Choose PDF'}</span>
+                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
+                    <HiOutlineDocumentText className="w-4 h-4 text-primary/60 shrink-0" />
+                    <span className="text-xs text-muted truncate">{pdfFile ? pdfFile.name : 'Choose PDF'}</span>
                     <input ref={pdfRef} type="file" accept=".pdf" className="hidden"
                       onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
                   </label>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70 mb-1">
+                  <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">
                     Cover {editId && '(optional)'}
                   </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-[#8B4513]/20 cursor-pointer hover:border-[#8B4513]/40 transition-colors">
-                    <HiOutlinePhotograph className="w-4 h-4 text-[#8B4513]/60 shrink-0" />
-                    <span className="text-xs text-[#6A5A4A] truncate">{coverImage ? coverImage.name : 'Choose image'}</span>
+                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
+                    <HiOutlinePhotograph className="w-4 h-4 text-primary/60 shrink-0" />
+                    <span className="text-xs text-muted truncate">{coverImage ? coverImage.name : 'Choose image'}</span>
                     <input ref={coverRef} type="file" accept="image/jpeg,image/png,image/webp" className="hidden"
                       onChange={(e) => setCoverImage(e.target.files?.[0] || null)} />
                   </label>
@@ -228,7 +228,7 @@ export default function BooksPage() {
               </div>
 
               <button type="submit" disabled={createMut.isPending || updateMut.isPending}
-                className="w-full py-2.5 rounded-lg bg-[#8B4513] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#a0522d] transition-colors disabled:opacity-50">
+                className="w-full py-2.5 rounded-lg bg-primary text-white font-bold text-sm uppercase tracking-widest hover:bg-primary-light transition-colors disabled:opacity-50">
                 {(createMut.isPending || updateMut.isPending) ? 'Uploading...' : editId ? 'Update' : 'Create'}
               </button>
             </form>
@@ -241,34 +241,34 @@ export default function BooksPage() {
         <CardGridSkeleton count={6} cols={1} />
       ) : (
         <>
-          <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
+          <div className="bg-card rounded-2xl border border-white/30 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#8B4513]/10">
-                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Book</th>
-                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Author</th>
-                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Section</th>
-                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">PDF</th>
-                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Cover</th>
-                    <th className="text-right px-5 py-3 text-xs font-black uppercase tracking-widest text-[#8B4513]/70">Actions</th>
+                  <tr className="border-b border-primary/10">
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-primary/70">Book</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-primary/70">Author</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-primary/70">Section</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-primary/70">PDF</th>
+                    <th className="text-left px-5 py-3 text-xs font-black uppercase tracking-widest text-primary/70">Cover</th>
+                    <th className="text-right px-5 py-3 text-xs font-black uppercase tracking-widest text-primary/70">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data?.books?.map((book: any) => (
-                    <tr key={book._id} className="border-b border-[#8B4513]/5 hover:bg-[#8B4513]/3 transition-colors">
+                    <tr key={book._id} className="border-b border-primary/5 hover:bg-primary/3 transition-colors">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
-                          <p className="font-bold text-[#4A3B32]">{book.bookName}</p>
+                          <p className="font-bold text-body">{book.bookName}</p>
                           {book.bookType === 'fullbook' && (
-                            <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">Full Book</span>
+                            <span className="text-2xs font-black uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-purple-100 text-purple-700">Full Book</span>
                           )}
                         </div>
-                        {book.description && <p className="text-xs text-[#6A5A4A] mt-0.5 line-clamp-1">{book.description}</p>}
+                        {book.description && <p className="text-xs text-muted mt-0.5 line-clamp-1">{book.description}</p>}
                       </td>
-                      <td className="px-5 py-3 text-[#6A5A4A]">{book.authorName}</td>
+                      <td className="px-5 py-3 text-muted">{book.authorName}</td>
                       <td className="px-5 py-3">
-                        <span className="inline-block px-2.5 py-1 rounded-lg bg-[#8B4513]/8 text-[#8B4513] text-xs font-bold">
+                        <span className="inline-block px-2.5 py-1 rounded-lg bg-primary/8 text-primary text-xs font-bold">
                           {getSectionName(book)}
                         </span>
                       </td>
@@ -278,7 +278,7 @@ export default function BooksPage() {
                             <HiOutlineDocumentText className="w-4 h-4" /> Yes
                           </span>
                         ) : (
-                          <span className="text-xs text-[#6A5A4A]/50">None</span>
+                          <span className="text-xs text-muted/50">None</span>
                         )}
                       </td>
                       <td className="px-5 py-3">
@@ -287,12 +287,12 @@ export default function BooksPage() {
                             <HiOutlinePhotograph className="w-4 h-4" /> Yes
                           </span>
                         ) : (
-                          <span className="text-xs text-[#6A5A4A]/50">None</span>
+                          <span className="text-xs text-muted/50">None</span>
                         )}
                       </td>
                       <td className="px-5 py-3 text-right">
                         <div className="flex gap-1 justify-end">
-                          <button onClick={() => handleEdit(book)} className="p-1.5 rounded-lg text-[#8B4513] hover:bg-[#8B4513]/10 transition-colors">
+                          <button onClick={() => handleEdit(book)} className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors">
                             <HiOutlinePencil className="w-4 h-4" />
                           </button>
                           <button onClick={() => { if (confirm('Delete this book and its files?')) deleteMut.mutate(book._id) }} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
@@ -306,7 +306,7 @@ export default function BooksPage() {
               </table>
             </div>
             {(!data?.books || data.books.length === 0) && (
-              <div className="text-center py-12 text-[#6A5A4A]/60">No books found</div>
+              <div className="text-center py-12 text-muted/60">No books found</div>
             )}
           </div>
 
@@ -316,17 +316,17 @@ export default function BooksPage() {
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page <= 1}
-                className="px-4 py-2 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm font-bold text-[#4A3B32] hover:bg-[#8B4513]/5 disabled:opacity-40 transition-colors"
+                className="px-4 py-2 rounded-xl bg-card border border-primary/10 text-sm font-bold text-body hover:bg-primary/5 disabled:opacity-40 transition-colors"
               >
                 Previous
               </button>
-              <span className="text-sm font-bold text-[#6A5A4A]">
+              <span className="text-sm font-bold text-muted">
                 Page {page} of {data.totalPages}
               </span>
               <button
                 onClick={() => setPage(p => Math.min(data.totalPages, p + 1))}
                 disabled={page >= data.totalPages}
-                className="px-4 py-2 rounded-xl bg-[#fdfaf2] border border-[#8B4513]/10 text-sm font-bold text-[#4A3B32] hover:bg-[#8B4513]/5 disabled:opacity-40 transition-colors"
+                className="px-4 py-2 rounded-xl bg-card border border-primary/10 text-sm font-bold text-body hover:bg-primary/5 disabled:opacity-40 transition-colors"
               >
                 Next
               </button>

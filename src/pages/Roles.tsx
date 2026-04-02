@@ -129,8 +129,8 @@ export default function Roles() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Roles & Permissions</h1>
-        <p className="text-sm text-[#6A5A4A] mt-1">
+        <h1 className="text-2xl font-serif font-black text-body">Roles & Permissions</h1>
+        <p className="text-sm text-muted mt-1">
           {isSuperAdmin ? 'Click any checkbox to toggle permissions. Changes take effect immediately.' : 'Overview of all roles and their permissions.'}
         </p>
       </div>
@@ -140,7 +140,7 @@ export default function Roles() {
         {sortedRoles.map((r: any) => (
           <div
             key={r._id}
-            className={`rounded-2xl border-2 p-5 transition-all ${ROLE_COLORS[r.name] || 'bg-gray-100 text-gray-700 border-gray-200'} ${myRole === r.name ? 'ring-2 ring-offset-2 ring-[#8B4513] scale-[1.02]' : ''}`}
+            className={`rounded-2xl border-2 p-5 transition-all ${ROLE_COLORS[r.name] || 'bg-gray-100 text-gray-700 border-gray-200'} ${myRole === r.name ? 'ring-2 ring-offset-2 ring-primary scale-[1.02]' : ''}`}
           >
             <div className="flex items-center gap-2 mb-2">
               <HiOutlineShieldCheck className="w-5 h-5" />
@@ -148,7 +148,7 @@ export default function Roles() {
             </div>
             <p className="text-xs font-medium opacity-80">{r.description}</p>
             {myRole === r.name && (
-              <span className="inline-block mt-3 text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-[#8B4513] text-white">
+              <span className="inline-block mt-3 text-2xs font-black uppercase tracking-widest px-2 py-0.5 rounded-full bg-primary text-white">
                 Your Role
               </span>
             )}
@@ -157,10 +157,10 @@ export default function Roles() {
       </div>
 
       {/* Permissions Matrix Table */}
-      <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-[#8B4513]/10 bg-[#f4ecd8]/50 flex items-center justify-between">
-          <h2 className="text-sm font-black uppercase tracking-widest text-[#8B4513]">Permissions Matrix</h2>
-          <span className="text-xs text-[#6A5A4A]">
+      <div className="bg-card rounded-2xl border border-white/30 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-primary/10 bg-cream/50 flex items-center justify-between">
+          <h2 className="text-sm font-black uppercase tracking-widest text-primary">Permissions Matrix</h2>
+          <span className="text-xs text-muted">
             {isSuperAdmin && <span className="text-emerald-600 font-bold mr-2">Editable</span>}
             Stored in database
           </span>
@@ -168,11 +168,11 @@ export default function Roles() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[#8B4513]/10">
-                <th className="px-5 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#6A5A4A] min-w-[200px]">Permission</th>
+              <tr className="border-b border-primary/10">
+                <th className="px-5 py-3 text-left text-2xs font-black uppercase tracking-widest text-muted min-w-[200px]">Permission</th>
                 {sortedRoles.map((r: any) => (
                   <th key={r._id} className="px-4 py-3 text-center">
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${ROLE_COLORS[r.name] || ''}`}>
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider ${ROLE_COLORS[r.name] || ''}`}>
                       {r.label}
                     </span>
                   </th>
@@ -183,15 +183,15 @@ export default function Roles() {
               {PERMISSION_SECTIONS.map((section) => (
                 <Fragment key={section.category}>
                   {/* Category Header */}
-                  <tr className="bg-[#f4ecd8]/30">
+                  <tr className="bg-cream/30">
                     <td colSpan={sortedRoles.length + 1} className="px-5 py-2">
-                      <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#8B4513]/60">{section.category}</span>
+                      <span className="text-2xs font-black uppercase tracking-[0.2em] text-primary/60">{section.category}</span>
                     </td>
                   </tr>
                   {/* Permission Rows */}
                   {section.perms.map((perm) => (
-                    <tr key={perm.path} className="border-b border-[#8B4513]/5 hover:bg-white/40 transition-colors">
-                      <td className="px-5 py-3 text-sm font-medium text-[#4A3B32]">{perm.label}</td>
+                    <tr key={perm.path} className="border-b border-primary/5 hover:bg-white/40 transition-colors">
+                      <td className="px-5 py-3 text-sm font-medium text-body">{perm.label}</td>
                       {sortedRoles.map((r: any) => {
                         const value = getPermValue(r.permissions, perm.path)
                         const canEdit = isSuperAdmin && r.name !== 'super_admin' // Can't remove super_admin's own permissions

@@ -63,11 +63,11 @@ export default function Team() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Team Members</h1>
-          <p className="text-sm text-[#6A5A4A] mt-1">Manage team members shown on the About page</p>
+          <h1 className="text-2xl font-serif font-black text-body">Team Members</h1>
+          <p className="text-sm text-muted mt-1">Manage team members shown on the About page</p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true) }}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#8B4513] text-white text-sm font-bold shadow-md hover:bg-[#a0522d] transition-colors">
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-md hover:bg-primary-light transition-colors">
           <HiOutlinePlus className="w-4 h-4" /> Add Member
         </button>
       </div>
@@ -75,41 +75,41 @@ export default function Team() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
-          <div className="bg-[#fdfaf2] rounded-2xl w-full max-w-lg shadow-2xl border border-white/30">
-            <div className="flex items-center justify-between p-5 border-b border-[#8B4513]/10">
-              <h2 className="text-lg font-bold text-[#4A3B32]">{editId ? 'Edit Member' : 'Add Member'}</h2>
-              <button onClick={resetForm} className="p-1 text-[#6A5A4A] hover:text-[#8B4513]"><HiOutlineX className="w-5 h-5" /></button>
+          <div className="bg-card rounded-2xl w-full max-w-lg shadow-2xl border border-white/30">
+            <div className="flex items-center justify-between p-5 border-b border-primary/10">
+              <h2 className="text-lg font-bold text-body">{editId ? 'Edit Member' : 'Add Member'}</h2>
+              <button onClick={resetForm} className="p-1 text-muted hover:text-primary"><HiOutlineX className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="p-5 space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Name</label>
+                  <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Name</label>
                   <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required />
                 </div>
                 <div>
-                  <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Role</label>
+                  <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Role</label>
                   <input value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}
-                    className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" required />
+                    className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required />
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Photo URL</label>
+                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Photo URL</label>
                 <input value={form.photo} onChange={(e) => setForm({ ...form, photo: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" />
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" />
               </div>
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Bio</label>
+                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Bio</label>
                 <textarea value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} rows={3}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30 resize-none" />
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30 resize-none" />
               </div>
               <div>
-                <label className="block text-xs font-black uppercase tracking-widest text-[#8B4513]/70 mb-1.5">Display Order</label>
+                <label className="block text-xs font-black uppercase tracking-widest text-primary/70 mb-1.5">Display Order</label>
                 <input type="number" value={form.order} onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30" />
+                  className="w-full px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" />
               </div>
               <button type="submit" disabled={createMut.isPending || updateMut.isPending}
-                className="w-full py-3 rounded-xl bg-[#8B4513] text-white font-bold text-sm uppercase tracking-widest hover:bg-[#a0522d] transition-colors disabled:opacity-50">
+                className="w-full py-3 rounded-xl bg-primary text-white font-bold text-sm uppercase tracking-widest hover:bg-primary-light transition-colors disabled:opacity-50">
                 {editId ? 'Update' : 'Create'}
               </button>
             </form>
@@ -123,9 +123,9 @@ export default function Team() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {data?.map((member: any) => (
-            <div key={member._id} className="bg-[#fdfaf2] rounded-2xl p-5 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+            <div key={member._id} className="bg-card rounded-2xl p-5 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
-                <div className="h-14 w-14 rounded-xl bg-[#8B4513]/10 flex items-center justify-center text-[#8B4513] text-xl font-black uppercase flex-shrink-0 overflow-hidden">
+                <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl font-black uppercase flex-shrink-0 overflow-hidden">
                   {member.photo ? (
                     <img src={member.photo} alt={member.name} className="h-full w-full object-cover" />
                   ) : (
@@ -133,15 +133,15 @@ export default function Team() {
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-[#4A3B32] text-base">{member.name}</h3>
-                  <p className="text-xs font-semibold text-[#8B4513]">{member.role}</p>
-                  {member.bio && <p className="text-xs text-[#6A5A4A] mt-2 line-clamp-2">{member.bio}</p>}
+                  <h3 className="font-bold text-body text-base">{member.name}</h3>
+                  <p className="text-xs font-semibold text-primary">{member.role}</p>
+                  {member.bio && <p className="text-xs text-muted mt-2 line-clamp-2">{member.bio}</p>}
                 </div>
               </div>
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#8B4513]/10">
-                <span className="text-[10px] font-bold text-[#6A5A4A]/60 uppercase">Order: {member.order}</span>
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-primary/10">
+                <span className="text-2xs font-bold text-muted/60 uppercase">Order: {member.order}</span>
                 <div className="flex gap-1">
-                  <button onClick={() => handleEdit(member)} className="p-1.5 rounded-lg text-[#8B4513] hover:bg-[#8B4513]/10 transition-colors">
+                  <button onClick={() => handleEdit(member)} className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors">
                     <HiOutlinePencil className="w-4 h-4" />
                   </button>
                   <button onClick={() => { if (confirm('Delete this member?')) deleteMut.mutate(member._id) }} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
@@ -152,7 +152,7 @@ export default function Team() {
             </div>
           ))}
           {(!data || data.length === 0) && (
-            <div className="col-span-full text-center py-12 text-[#6A5A4A]/60">No team members yet</div>
+            <div className="col-span-full text-center py-12 text-muted/60">No team members yet</div>
           )}
         </div>
       )}

@@ -26,11 +26,11 @@ export default function DonationList() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Donation List</h1>
-        <p className="text-sm text-[#6A5A4A] mt-1">Public donation records displayed on the homepage</p>
+        <h1 className="text-2xl font-serif font-black text-body">Donation List</h1>
+        <p className="text-sm text-muted mt-1">Public donation records displayed on the homepage</p>
       </div>
 
-      <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-2xl border border-white/30 shadow-sm overflow-hidden">
         {isLoading ? (
           <TableSkeleton rows={8} cols={5} />
         ) : (
@@ -38,23 +38,23 @@ export default function DonationList() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#8B4513]/10 bg-[#f4ecd8]/50">
-                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Donor Name</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Amount</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Order ID</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Payment ID</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Date</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Actions</th>
+                  <tr className="border-b border-primary/10 bg-cream/50">
+                    <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Donor Name</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Amount</th>
+                    <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Order ID</th>
+                    <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Payment ID</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Date</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {data?.donations?.map((d: any) => (
-                    <tr key={d._id} className="border-b border-[#8B4513]/5 hover:bg-white/30 transition-colors">
-                      <td className="px-4 py-3 font-bold text-[#4A3B32]">{d.donaterName}</td>
-                      <td className="px-4 py-3 text-center font-black text-[#4A3B32]">₹{d.donationAmount}</td>
-                      <td className="px-4 py-3 text-[#6A5A4A] font-mono text-xs">{d.orderId}</td>
-                      <td className="px-4 py-3 text-[#6A5A4A] font-mono text-xs">{d.paymentId}</td>
-                      <td className="px-4 py-3 text-center text-xs text-[#6A5A4A]">
+                    <tr key={d._id} className="border-b border-primary/5 hover:bg-white/30 transition-colors">
+                      <td className="px-4 py-3 font-bold text-body">{d.donaterName}</td>
+                      <td className="px-4 py-3 text-center font-black text-body">₹{d.donationAmount}</td>
+                      <td className="px-4 py-3 text-muted font-mono text-xs">{d.orderId}</td>
+                      <td className="px-4 py-3 text-muted font-mono text-xs">{d.paymentId}</td>
+                      <td className="px-4 py-3 text-center text-xs text-muted">
                         {new Date(d.donationDate).toLocaleDateString('en-IN')}
                       </td>
                       <td className="px-4 py-3 text-center">
@@ -72,11 +72,11 @@ export default function DonationList() {
             </div>
 
             {data && data.totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-[#8B4513]/10">
-                <p className="text-xs text-[#6A5A4A]">Page {data.page} of {data.totalPages} ({data.total} donations)</p>
+              <div className="flex items-center justify-between px-4 py-3 border-t border-primary/10">
+                <p className="text-xs text-muted">Page {data.page} of {data.totalPages} ({data.total} donations)</p>
                 <div className="flex gap-2">
-                  <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B4513] hover:bg-[#8B4513]/10 disabled:opacity-30">Previous</button>
-                  <button disabled={page >= data.totalPages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B4513] hover:bg-[#8B4513]/10 disabled:opacity-30">Next</button>
+                  <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-3 py-1.5 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-30">Previous</button>
+                  <button disabled={page >= data.totalPages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-30">Next</button>
                 </div>
               </div>
             )}

@@ -68,13 +68,13 @@ export default function AdminLayout() {
   const sidebarContent = (
     <>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-[#8B4513]/15">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-[#8B4513] to-[#6B3410] flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-primary/15">
+        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
           <span className="text-white font-serif font-black text-lg">S</span>
         </div>
         <div>
-          <h1 className="font-serif font-black text-[#8B4513] text-lg tracking-wide">Sasanam</h1>
-          <p className="text-[10px] font-bold text-[#8B4513]/60 uppercase tracking-[0.2em]">Admin Panel</p>
+          <h1 className="font-serif font-black text-primary text-lg tracking-wide">Sasanam</h1>
+          <p className="text-2xs font-bold text-primary/60 uppercase tracking-[0.2em]">Admin Panel</p>
         </div>
       </div>
 
@@ -89,8 +89,8 @@ export default function AdminLayout() {
             className={({ isActive }) =>
               `group flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${
                 isActive
-                  ? 'bg-[#8B4513] text-white shadow-md shadow-[#8B4513]/20'
-                  : 'text-[#6A5A4A] hover:bg-[#8B4513]/8 hover:text-[#8B4513] hover:translate-x-1'
+                  ? 'bg-primary text-white shadow-md shadow-primary/20'
+                  : 'text-muted hover:bg-primary/8 hover:text-primary hover:translate-x-1'
               } ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`
             }
             style={{ transitionDelay: mounted ? `${i * 40}ms` : '0ms' }}
@@ -102,16 +102,16 @@ export default function AdminLayout() {
       </nav>
 
       {/* User & Logout */}
-      <div className="p-4 border-t border-[#8B4513]/15">
+      <div className="p-4 border-t border-primary/15">
         <div className="flex items-center gap-3 px-2 mb-3">
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#8B4513] to-[#a0522d] flex items-center justify-center text-white text-xs font-black uppercase shadow-md">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-black uppercase shadow-md">
             {(user.fullName || user.email || 'A').charAt(0)}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-[#4A3B32] truncate capitalize">{user.fullName || 'Admin'}</p>
-            <p className="text-[11px] text-[#6A5A4A] truncate">{user.email}</p>
+            <p className="text-sm font-bold text-body truncate capitalize">{user.fullName || 'Admin'}</p>
+            <p className="text-2xs text-muted truncate">{user.email}</p>
             {badge && (
-              <span className={`inline-block mt-1 text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white ${badge.color}`}>
+              <span className={`inline-block mt-1 text-2xs font-black uppercase tracking-wider px-2 py-0.5 rounded-full text-white ${badge.color}`}>
                 {badge.label}
               </span>
             )}
@@ -129,9 +129,9 @@ export default function AdminLayout() {
   )
 
   return (
-    <div className="min-h-screen bg-[#f4ecd8] flex">
+    <div className="min-h-screen bg-cream flex">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-col bg-[#fdfaf2] border-r border-[#8B4513]/10 fixed inset-y-0 left-0 z-30 shadow-lg">
+      <aside className="hidden lg:flex w-64 flex-col bg-card border-r border-primary/10 fixed inset-y-0 left-0 z-30 shadow-lg">
         {sidebarContent}
       </aside>
 
@@ -144,12 +144,12 @@ export default function AdminLayout() {
             style={{ animation: 'fadeInUp 0.2s ease-out' }}
           />
           <aside
-            className="fixed inset-y-0 left-0 w-72 flex flex-col bg-[#fdfaf2] shadow-2xl z-50"
+            className="fixed inset-y-0 left-0 w-72 flex flex-col bg-card shadow-2xl z-50"
             style={{ animation: 'fadeInLeft 0.3s ease-out' }}
           >
             <button
               onClick={() => setSidebarOpen(false)}
-              className="absolute top-4 right-4 p-2 text-[#6A5A4A] hover:text-[#8B4513] hover:bg-[#8B4513]/10 rounded-lg transition-all"
+              className="absolute top-4 right-4 p-2 text-muted hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
             >
               <HiOutlineX className="w-6 h-6" />
             </button>
@@ -161,17 +161,17 @@ export default function AdminLayout() {
       {/* Main Content */}
       <div className="flex-1 lg:ml-64">
         {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 z-20 bg-[#fdfaf2]/95 backdrop-blur-md border-b border-[#8B4513]/10 px-4 py-3 flex items-center gap-3 shadow-sm">
+        <header className="lg:hidden sticky top-0 z-20 bg-card/95 backdrop-blur-md border-b border-primary/10 px-4 py-3 flex items-center gap-3 shadow-sm">
           <button
             onClick={() => setSidebarOpen(true)}
-            className="p-2 text-[#8B4513] hover:bg-[#8B4513]/10 rounded-lg active:scale-95 transition-all"
+            className="p-2 text-primary hover:bg-primary/10 rounded-lg active:scale-95 transition-all"
           >
             <HiOutlineMenu className="w-6 h-6" />
           </button>
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-[#8B4513] to-[#6B3410] flex items-center justify-center shadow-sm">
+          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-sm">
             <span className="text-white font-serif font-black text-sm">S</span>
           </div>
-          <h1 className="font-serif font-black text-[#8B4513] text-lg">Sasanam Admin</h1>
+          <h1 className="font-serif font-black text-primary text-lg">Sasanam Admin</h1>
         </header>
 
         <main className="p-4 sm:p-6 lg:p-8">

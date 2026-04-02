@@ -107,15 +107,15 @@ export default function Dashboard() {
       <div className={`transition-all duration-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-4'}`}>
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-serif font-black text-[#4A3B32]">Dashboard</h1>
-            <p className="text-sm text-[#6A5A4A] mt-1 flex items-center gap-2">
+            <h1 className="text-3xl font-serif font-black text-body">Dashboard</h1>
+            <p className="text-sm text-muted mt-1 flex items-center gap-2">
               <HiOutlineCalendar className="w-4 h-4" />
               Platform overview and analytics
             </p>
           </div>
-          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#fdfaf2] border border-white/30 shadow-sm">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-card border border-white/30 shadow-sm">
             <HiOutlineTrendingUp className="w-5 h-5 text-emerald-500" />
-            <span className="text-sm font-bold text-[#4A3B32]">Total Revenue: <span className="text-emerald-600">₹{totalRevenue.toLocaleString()}</span></span>
+            <span className="text-sm font-bold text-body">Total Revenue: <span className="text-emerald-600">₹{totalRevenue.toLocaleString()}</span></span>
           </div>
         </div>
       </div>
@@ -125,7 +125,7 @@ export default function Dashboard() {
         {stats.map((stat, i) => (
           <div
             key={stat.label}
-            className={`group relative overflow-hidden bg-[#fdfaf2] rounded-2xl p-5 border border-white/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            className={`group relative overflow-hidden bg-card rounded-2xl p-5 border border-white/30 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
             style={{ transitionDelay: `${i * 100}ms` }}
           >
             <div className={`absolute top-0 right-0 w-24 h-24 bg-gradient-to-br ${stat.color} opacity-[0.07] rounded-bl-[60px] transition-all duration-500 group-hover:w-32 group-hover:h-32`} />
@@ -135,10 +135,10 @@ export default function Dashboard() {
                   <stat.icon className="w-5 h-5" />
                 </div>
               </div>
-              <p className="text-3xl font-black text-[#4A3B32]">
+              <p className="text-3xl font-black text-body">
                 <AnimatedNumber value={typeof stat.value === 'number' ? stat.value : 0} />
               </p>
-              <p className="text-xs font-bold text-[#6A5A4A]/70 uppercase tracking-wider mt-1">{stat.label}</p>
+              <p className="text-xs font-bold text-muted/70 uppercase tracking-wider mt-1">{stat.label}</p>
             </div>
           </div>
         ))}
@@ -152,7 +152,7 @@ export default function Dashboard() {
             className={`group relative overflow-hidden rounded-2xl p-5 border shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-500 ${
               stat.label === 'Failed Payments'
                 ? 'bg-red-50/80 border-red-100'
-                : 'bg-gradient-to-br from-[#fdfaf2] to-[#f4ecd8]/50 border-white/30'
+                : 'bg-gradient-to-br from-card to-cream/50 border-white/30'
             } ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
             style={{ transitionDelay: `${(i + 4) * 100}ms` }}
           >
@@ -161,10 +161,10 @@ export default function Dashboard() {
               <div className={`h-10 w-10 rounded-xl flex items-center justify-center bg-gradient-to-br ${stat.color} text-white shadow-md mb-3 transition-transform duration-300 group-hover:scale-110`}>
                 <stat.icon className="w-5 h-5" />
               </div>
-              <p className="text-2xl font-black text-[#4A3B32]">
+              <p className="text-2xl font-black text-body">
                 <AnimatedNumber value={stat.value} prefix={stat.prefix || ''} />
               </p>
-              <p className="text-xs font-bold text-[#6A5A4A]/70 uppercase tracking-wider mt-1">{stat.label}</p>
+              <p className="text-xs font-bold text-muted/70 uppercase tracking-wider mt-1">{stat.label}</p>
             </div>
           </div>
         ))}
@@ -173,10 +173,10 @@ export default function Dashboard() {
       {/* Charts Row */}
       <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-700 delay-500 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         {/* Revenue Trend Area Chart */}
-        <div className="lg:col-span-2 bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm">
+        <div className="lg:col-span-2 bg-card rounded-2xl p-6 border border-white/30 shadow-sm">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513]">Revenue Overview</h3>
-            <span className="text-xs font-semibold text-[#6A5A4A] bg-white/50 px-3 py-1 rounded-full">Last 6 months</span>
+            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Revenue Overview</h3>
+            <span className="text-xs font-semibold text-muted bg-white/50 px-3 py-1 rounded-full">Last 6 months</span>
           </div>
           <ResponsiveContainer width="100%" height={280}>
             <AreaChart data={trendData}>
@@ -205,8 +205,8 @@ export default function Dashboard() {
         </div>
 
         {/* User Breakdown Pie Chart */}
-        <div className="bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm">
-          <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513] mb-6">User Breakdown</h3>
+        <div className="bg-card rounded-2xl p-6 border border-white/30 shadow-sm">
+          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6">User Breakdown</h3>
           {userBreakdownData.length > 0 ? (
             <ResponsiveContainer width="100%" height={280}>
               <PieChart>
@@ -232,15 +232,15 @@ export default function Dashboard() {
               </PieChart>
             </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[280px] text-sm text-[#6A5A4A]/60">No user data</div>
+            <div className="flex items-center justify-center h-[280px] text-sm text-muted/60">No user data</div>
           )}
         </div>
       </div>
 
       {/* Payment Status Bar Chart */}
       <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-700 delay-700 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-        <div className="bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm">
-          <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513] mb-6">Payment Status</h3>
+        <div className="bg-card rounded-2xl p-6 border border-white/30 shadow-sm">
+          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6">Payment Status</h3>
           <ResponsiveContainer width="100%" height={240}>
             <BarChart data={paymentStatusData} barSize={32}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5dcc8" />
@@ -260,8 +260,8 @@ export default function Dashboard() {
         </div>
 
         {/* Revenue Split */}
-        <div className="bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm">
-          <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513] mb-6">Revenue Split</h3>
+        <div className="bg-card rounded-2xl p-6 border border-white/30 shadow-sm">
+          <h3 className="text-sm font-black uppercase tracking-widest text-primary mb-6">Revenue Split</h3>
           <ResponsiveContainer width="100%" height={240}>
             <PieChart>
               <Pie
@@ -287,7 +287,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Stats Summary */}
-        <div className="bg-gradient-to-br from-[#8B4513] to-[#6B3410] rounded-2xl p-6 shadow-lg text-white">
+        <div className="bg-gradient-to-br from-primary to-primary-dark rounded-2xl p-6 shadow-lg text-white">
           <h3 className="text-sm font-black uppercase tracking-widest text-white/80 mb-6">Quick Summary</h3>
           <div className="space-y-5">
             <div className="flex items-center justify-between">
@@ -331,9 +331,9 @@ export default function Dashboard() {
       {/* Recent Activity */}
       <div className={`grid grid-cols-1 lg:grid-cols-3 gap-6 transition-all duration-700 delay-900 ${loaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
         {/* Recent Users */}
-        <div className="bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-card rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513]">Recent Users</h3>
+            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Recent Users</h3>
             <span className="flex h-2 w-2 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
@@ -346,29 +346,29 @@ export default function Dashboard() {
                 className={`flex items-center gap-3 p-3 rounded-xl hover:bg-white/50 transition-all duration-300 cursor-pointer group ${loaded ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-4'}`}
                 style={{ transitionDelay: `${1000 + i * 80}ms` }}
               >
-                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[#8B4513] to-[#a0522d] flex items-center justify-center text-white text-xs font-black uppercase shadow-md group-hover:scale-110 transition-transform">
+                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-primary-light flex items-center justify-center text-white text-xs font-black uppercase shadow-md group-hover:scale-110 transition-transform">
                   {(user.fullName || user.email || '?').charAt(0)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#4A3B32] truncate capitalize">{user.fullName}</p>
-                  <p className="text-[11px] text-[#6A5A4A] truncate">{user.email}</p>
+                  <p className="text-sm font-bold text-body truncate capitalize">{user.fullName}</p>
+                  <p className="text-2xs text-muted truncate">{user.email}</p>
                 </div>
                 {user.isSubscribed && (
-                  <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 shadow-sm">Sub</span>
+                  <span className="text-2xs font-black uppercase px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 shadow-sm">Sub</span>
                 )}
               </div>
             ))}
             {(!data?.recent?.users || data.recent.users.length === 0) && (
-              <p className="text-sm text-[#6A5A4A]/60 text-center py-8">No users yet</p>
+              <p className="text-sm text-muted/60 text-center py-8">No users yet</p>
             )}
           </div>
         </div>
 
         {/* Recent Subscription Payments */}
-        <div className="bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-card rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513]">Recent Subscriptions</h3>
-            <HiOutlineCreditCard className="w-5 h-5 text-[#8B4513]/40" />
+            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Recent Subscriptions</h3>
+            <HiOutlineCreditCard className="w-5 h-5 text-primary/40" />
           </div>
           <div className="space-y-2">
             {data?.recent?.subscriptionPayments?.map((p: any, i: number) => (
@@ -381,23 +381,23 @@ export default function Dashboard() {
                   p.status === 'paid' ? 'bg-emerald-500 shadow-emerald-200' : p.status === 'failed' ? 'bg-red-500 shadow-red-200' : 'bg-amber-500 shadow-amber-200'
                 }`} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#4A3B32] truncate capitalize">{p.userId?.fullName || 'Unknown'}</p>
-                  <p className="text-[11px] text-[#6A5A4A] truncate font-mono">{p.orderId}</p>
+                  <p className="text-sm font-bold text-body truncate capitalize">{p.userId?.fullName || 'Unknown'}</p>
+                  <p className="text-2xs text-muted truncate font-mono">{p.orderId}</p>
                 </div>
-                <span className="text-sm font-black text-[#4A3B32] group-hover:text-[#8B4513] transition-colors">₹{p.amount}</span>
+                <span className="text-sm font-black text-body group-hover:text-primary transition-colors">₹{p.amount}</span>
               </div>
             ))}
             {(!data?.recent?.subscriptionPayments || data.recent.subscriptionPayments.length === 0) && (
-              <p className="text-sm text-[#6A5A4A]/60 text-center py-8">No payments yet</p>
+              <p className="text-sm text-muted/60 text-center py-8">No payments yet</p>
             )}
           </div>
         </div>
 
         {/* Recent Donation Payments */}
-        <div className="bg-[#fdfaf2] rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
+        <div className="bg-card rounded-2xl p-6 border border-white/30 shadow-sm hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-black uppercase tracking-widest text-[#8B4513]">Recent Donations</h3>
-            <HiOutlineGift className="w-5 h-5 text-[#8B4513]/40" />
+            <h3 className="text-sm font-black uppercase tracking-widest text-primary">Recent Donations</h3>
+            <HiOutlineGift className="w-5 h-5 text-primary/40" />
           </div>
           <div className="space-y-2">
             {data?.recent?.donationPayments?.map((p: any, i: number) => (
@@ -410,14 +410,14 @@ export default function Dashboard() {
                   p.status === 'paid' ? 'bg-emerald-500 shadow-emerald-200' : p.status === 'failed' ? 'bg-red-500 shadow-red-200' : 'bg-amber-500 shadow-amber-200'
                 }`} />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#4A3B32] truncate capitalize">{p.userId?.fullName || 'Unknown'}</p>
-                  <p className="text-[11px] text-[#6A5A4A] truncate font-mono">{p.orderId}</p>
+                  <p className="text-sm font-bold text-body truncate capitalize">{p.userId?.fullName || 'Unknown'}</p>
+                  <p className="text-2xs text-muted truncate font-mono">{p.orderId}</p>
                 </div>
-                <span className="text-sm font-black text-[#4A3B32] group-hover:text-[#8B4513] transition-colors">₹{p.amount}</span>
+                <span className="text-sm font-black text-body group-hover:text-primary transition-colors">₹{p.amount}</span>
               </div>
             ))}
             {(!data?.recent?.donationPayments || data.recent.donationPayments.length === 0) && (
-              <p className="text-sm text-[#6A5A4A]/60 text-center py-8">No donations yet</p>
+              <p className="text-sm text-muted/60 text-center py-8">No donations yet</p>
             )}
           </div>
         </div>

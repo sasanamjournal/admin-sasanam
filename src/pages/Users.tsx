@@ -78,26 +78,26 @@ export default function Users() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-serif font-black text-[#4A3B32]">Users</h1>
-        <p className="text-sm text-[#6A5A4A] mt-1">Manage user accounts, roles, and download access</p>
+        <h1 className="text-2xl font-serif font-black text-body">Users</h1>
+        <p className="text-sm text-muted mt-1">Manage user accounts, roles, and download access</p>
       </div>
 
       {/* Filters */}
-      <div className="bg-[#fdfaf2] rounded-2xl p-4 border border-white/30 shadow-sm mb-6">
+      <div className="bg-card rounded-2xl p-4 border border-white/30 shadow-sm mb-6">
         <div className="flex flex-wrap gap-3 items-center">
           <form onSubmit={handleSearch} className="flex-1 min-w-[200px] relative">
-            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#6A5A4A]/50" />
+            <HiOutlineSearch className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted/50" />
             <input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder="Search by name or email..."
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none focus:border-[#8B4513]/30"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30"
             />
           </form>
           <select
             value={roleFilter}
             onChange={(e) => { setRoleFilter(e.target.value); setPage(1) }}
-            className="px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none"
+            className="px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none"
           >
             <option value="">All Roles</option>
             <option value="user">User</option>
@@ -108,7 +108,7 @@ export default function Users() {
           <select
             value={subFilter}
             onChange={(e) => { setSubFilter(e.target.value); setPage(1) }}
-            className="px-4 py-2.5 rounded-xl bg-white/50 border border-[#8B4513]/10 text-sm text-[#4A3B32] focus:outline-none"
+            className="px-4 py-2.5 rounded-xl bg-white/50 border border-primary/10 text-sm text-body focus:outline-none"
           >
             <option value="">All Status</option>
             <option value="true">Subscribed</option>
@@ -118,7 +118,7 @@ export default function Users() {
       </div>
 
       {/* Users Table */}
-      <div className="bg-[#fdfaf2] rounded-2xl border border-white/30 shadow-sm overflow-hidden">
+      <div className="bg-card rounded-2xl border border-white/30 shadow-sm overflow-hidden">
         {isLoading ? (
           <TableSkeleton rows={8} cols={6} />
         ) : (
@@ -126,15 +126,15 @@ export default function Users() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-[#8B4513]/10 bg-[#f4ecd8]/50">
-                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Name</th>
-                    <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Email</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Role</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Subscribed</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Download</th>
-                    <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Joined</th>
+                  <tr className="border-b border-primary/10 bg-cream/50">
+                    <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Name</th>
+                    <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Email</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Role</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Subscribed</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Download</th>
+                    <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Joined</th>
                     {can('users.delete') && (
-                      <th className="px-4 py-3 text-center text-[10px] font-black uppercase tracking-widest text-[#8B4513]/70">Actions</th>
+                      <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Actions</th>
                     )}
                   </tr>
                 </thead>
@@ -144,16 +144,16 @@ export default function Users() {
                     const canEdit = canChangeRole(user.role)
 
                     return (
-                      <tr key={user._id} className="border-b border-[#8B4513]/5 hover:bg-white/30 transition-colors">
+                      <tr key={user._id} className="border-b border-primary/5 hover:bg-white/30 transition-colors">
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
-                            <div className="h-8 w-8 rounded-full bg-[#8B4513]/10 flex items-center justify-center text-[#8B4513] text-xs font-black uppercase">
+                            <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-black uppercase">
                               {(user.fullName || '?').charAt(0)}
                             </div>
-                            <span className="font-bold text-[#4A3B32] capitalize">{user.fullName}</span>
+                            <span className="font-bold text-body capitalize">{user.fullName}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-[#6A5A4A]">{user.email}</td>
+                        <td className="px-4 py-3 text-muted">{user.email}</td>
                         <td className="px-4 py-3 text-center">
                           {editingRole === user._id && canEdit ? (
                             <select
@@ -163,7 +163,7 @@ export default function Users() {
                               }}
                               onBlur={() => setEditingRole(null)}
                               autoFocus
-                              className="px-2 py-1 rounded-lg border border-[#8B4513]/20 text-xs font-bold bg-white focus:outline-none focus:border-[#8B4513]"
+                              className="px-2 py-1 rounded-lg border border-primary/20 text-xs font-bold bg-white focus:outline-none focus:border-primary"
                             >
                               {assignableRoles.map((r) => (
                                 <option key={r} value={r}>{ROLE_LABELS[r].label}</option>
@@ -173,7 +173,7 @@ export default function Users() {
                             <button
                               onClick={() => canEdit && setEditingRole(user._id)}
                               disabled={!canEdit}
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors ${roleInfo.color} ${canEdit ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider transition-colors ${roleInfo.color} ${canEdit ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
                             >
                               <HiOutlineShieldCheck className="w-3 h-3" />
                               {roleInfo.label}
@@ -181,7 +181,7 @@ export default function Users() {
                           )}
                         </td>
                         <td className="px-4 py-3 text-center">
-                          <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                          <span className={`inline-block px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider ${
                             user.isSubscribed ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'
                           }`}>
                             {user.isSubscribed ? 'Yes' : 'No'}
@@ -196,7 +196,7 @@ export default function Users() {
                                   body: { canDownload: !user.canDownload },
                                 })
                               }
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider transition-colors ${
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider transition-colors ${
                                 user.canDownload
                                   ? 'bg-indigo-100 text-indigo-700 hover:bg-indigo-200'
                                   : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
@@ -206,7 +206,7 @@ export default function Users() {
                               {user.canDownload ? 'Enabled' : 'Disabled'}
                             </button>
                           ) : (
-                            <span className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            <span className={`inline-block px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider ${
                               user.canDownload ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'
                             }`}>
                               <HiOutlineDownload className="w-3 h-3 inline mr-1" />
@@ -214,7 +214,7 @@ export default function Users() {
                             </span>
                           )}
                         </td>
-                        <td className="px-4 py-3 text-center text-[#6A5A4A] text-xs">
+                        <td className="px-4 py-3 text-center text-muted text-xs">
                           {new Date(user.createdAt).toLocaleDateString('en-IN')}
                         </td>
                         {can('users.delete') && (
@@ -239,22 +239,22 @@ export default function Users() {
 
             {/* Pagination */}
             {data && data.totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-[#8B4513]/10">
-                <p className="text-xs text-[#6A5A4A]">
+              <div className="flex items-center justify-between px-4 py-3 border-t border-primary/10">
+                <p className="text-xs text-muted">
                   Page {data.page} of {data.totalPages} ({data.total} users)
                 </p>
                 <div className="flex gap-2">
                   <button
                     disabled={page <= 1}
                     onClick={() => setPage((p) => p - 1)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B4513] hover:bg-[#8B4513]/10 disabled:opacity-30 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-30 transition-colors"
                   >
                     Previous
                   </button>
                   <button
                     disabled={page >= data.totalPages}
                     onClick={() => setPage((p) => p + 1)}
-                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B4513] hover:bg-[#8B4513]/10 disabled:opacity-30 transition-colors"
+                    className="px-3 py-1.5 rounded-lg text-xs font-bold text-primary hover:bg-primary/10 disabled:opacity-30 transition-colors"
                   >
                     Next
                   </button>
