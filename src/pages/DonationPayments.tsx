@@ -97,7 +97,7 @@ export default function DonationPayments() {
                       </td>
                       <td className="px-4 py-3 text-muted font-mono text-xs">{p.orderId}</td>
                       <td className="px-4 py-3 text-muted font-mono text-xs">{p.paymentId || '-'}</td>
-                      <td className="px-4 py-3 text-center font-black text-body">₹{p.amount}</td>
+                      <td className="px-4 py-3 text-center font-black text-body">₹{(p.amount / 100).toFixed(2)}</td>
                       <td className="px-4 py-3 text-muted text-xs max-w-[200px] truncate">{p.donorMessage || '-'}</td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-block px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider ${

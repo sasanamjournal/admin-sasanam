@@ -168,16 +168,16 @@ export default function Dashboard() {
   ]
 
   const revenueStats = [
-    { label: 'Subscription Revenue', value: data?.subscriptionPayments?.revenue || 0, icon: HiOutlineCurrencyRupee, color: 'from-green-500 to-emerald-600', prefix: '₹' },
-    { label: 'Donation Revenue', value: data?.donationPayments?.revenue || 0, icon: HiOutlineGift, color: 'from-amber-500 to-orange-600', prefix: '₹' },
+    { label: 'Subscription Revenue', value: Math.round((data?.subscriptionPayments?.revenue || 0) / 100), icon: HiOutlineCurrencyRupee, color: 'from-green-500 to-emerald-600', prefix: '₹' },
+    { label: 'Donation Revenue', value: Math.round((data?.donationPayments?.revenue || 0) / 100), icon: HiOutlineGift, color: 'from-amber-500 to-orange-600', prefix: '₹' },
     { label: 'Paid Subscriptions', value: data?.subscriptionPayments?.paid || 0, icon: HiOutlineCreditCard, color: 'from-teal-500 to-cyan-600' },
     { label: 'Failed Payments', value: (data?.subscriptionPayments?.failed || 0) + (data?.donationPayments?.failed || 0), icon: HiOutlineExclamationCircle, color: 'from-red-500 to-rose-600' },
   ]
 
-  // Build chart data from available data
+  // Build chart data from available data (convert paise to rupees)
   const revenueChartData = [
-    { name: 'Subscriptions', value: data?.subscriptionPayments?.revenue || 0 },
-    { name: 'Donations', value: data?.donationPayments?.revenue || 0 },
+    { name: 'Subscriptions', value: Math.round((data?.subscriptionPayments?.revenue || 0) / 100) },
+    { name: 'Donations', value: Math.round((data?.donationPayments?.revenue || 0) / 100) },
   ]
 
   const paymentStatusData = [
@@ -197,8 +197,8 @@ export default function Dashboard() {
   const recentDonations = data?.recent?.donationPayments || []
   const trendData = (() => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun']
-    const subRevenue = data?.subscriptionPayments?.revenue || 0
-    const donRevenue = data?.donationPayments?.revenue || 0
+    const subRevenue = (data?.subscriptionPayments?.revenue || 0) / 100
+    const donRevenue = (data?.donationPayments?.revenue || 0) / 100
     return months.map((name, i) => ({
       name,
       subscriptions: Math.round((subRevenue / 6) * (0.5 + Math.random())),
@@ -206,7 +206,7 @@ export default function Dashboard() {
     }))
   })()
 
-  const totalRevenue = (data?.subscriptionPayments?.revenue || 0) + (data?.donationPayments?.revenue || 0)
+  const totalRevenue = Math.round(((data?.subscriptionPayments?.revenue || 0) + (data?.donationPayments?.revenue || 0)) / 100)
 
   return (
     <div className="space-y-8">

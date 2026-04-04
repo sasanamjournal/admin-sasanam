@@ -49,7 +49,7 @@ export default function FailedPayments() {
                   </td>
                   <td className="px-4 py-3 text-muted font-mono text-xs">{p.orderId}</td>
                   <td className="px-4 py-3 text-muted font-mono text-xs">{p.paymentId || '-'}</td>
-                  <td className="px-4 py-3 text-center font-black text-red-600">₹{p.amount}</td>
+                  <td className="px-4 py-3 text-center font-black text-red-600">₹{(p.amount / 100).toFixed(2)}</td>
                   <td className="px-4 py-3 text-center text-xs text-muted">{p.currency}</td>
                   <td className="px-4 py-3 text-center text-xs text-muted">
                     {new Date(p.createdAt).toLocaleDateString('en-IN')} {new Date(p.createdAt).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}

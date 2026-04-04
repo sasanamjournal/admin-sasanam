@@ -24,6 +24,7 @@ export default function Users() {
   const [editingRole, setEditingRole] = useState<string | null>(null)
   const queryClient = useQueryClient()
   const { can, isSuperAdmin, role: myRole } = usePermissions()
+  const myUserId = (() => { try { return JSON.parse(localStorage.getItem('admin_user') || '{}')._id || '' } catch { return '' } })()
 
   const { data, isLoading } = useQuery({
     queryKey: ['users', page, search, roleFilter, subFilter],
@@ -65,14 +66,33 @@ export default function Users() {
   const assignableRoles = getAssignableRoles()
 
   // Can the current user modify this target user's role?
-  const canChangeRole = (targetRole: string) => {
+  const canChangeRole = (userId: string, targetRole: string) => {
     if (!can('users.update')) return false
+    // Nobody can change their own role
+    if (userId === myUserId) return false
     if (isSuperAdmin) return true
     if (myRole === 'admin') {
       // Admin cannot change admin or super_admin roles
       return !['admin', 'super_admin'].includes(targetRole)
     }
     return false
+  }
+
+  // Can the current user modify this target user's toggles (download, subscription)?
+  const canEditToggles = (userId: string, targetRole: string) => {
+    if (!can('users.update')) return false
+    if (userId === myUserId) return false
+    if (isSuperAdmin) return true
+    if (myRole === 'admin') return !['admin', 'super_admin'].includes(targetRole)
+    return false
+  }
+
+  // Can the current user delete this target user?
+  const canDeleteUser = (userId: string, targetRole: string) => {
+    if (!can('users.delete')) return false
+    if (userId === myUserId) return false
+    if (isSuperAdmin) return true
+    return !['admin', 'super_admin'].includes(targetRole)
   }
 
   return (
@@ -141,21 +161,26 @@ export default function Users() {
                 <tbody>
                   {data?.users?.map((user: any) => {
                     const roleInfo = ROLE_LABELS[user.role] || ROLE_LABELS.user
-                    const canEdit = canChangeRole(user.role)
+                    const isSelf = user._id === myUserId
+                    const canEditRole = canChangeRole(user._id, user.role)
+                    const canToggle = canEditToggles(user._id, user.role)
 
                     return (
-                      <tr key={user._id} className="border-b border-primary/5 hover:bg-white/30 transition-colors">
+                      <tr key={user._id} className={`border-b border-primary/5 hover:bg-white/30 transition-colors ${isSelf ? 'bg-primary/[0.03]' : ''}`}>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-2">
                             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-black uppercase">
                               {(user.fullName || '?').charAt(0)}
                             </div>
-                            <span className="font-bold text-body capitalize">{user.fullName}</span>
+                            <div>
+                              <span className="font-bold text-body capitalize">{user.fullName}</span>
+                              {isSelf && <span className="ml-1.5 text-2xs text-primary font-bold">(You)</span>}
+                            </div>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-muted">{user.email}</td>
                         <td className="px-4 py-3 text-center">
-                          {editingRole === user._id && canEdit ? (
+                          {editingRole === user._id && canEditRole ? (
                             <select
                               value={user.role}
                               onChange={(e) => {
@@ -171,9 +196,10 @@ export default function Users() {
                             </select>
                           ) : (
                             <button
-                              onClick={() => canEdit && setEditingRole(user._id)}
-                              disabled={!canEdit}
-                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider transition-colors ${roleInfo.color} ${canEdit ? 'cursor-pointer hover:opacity-80' : 'cursor-default'}`}
+                              onClick={() => canEditRole && setEditingRole(user._id)}
+                              disabled={!canEditRole}
+                              title={isSelf ? 'Cannot change your own role' : !canEditRole ? 'Insufficient permissions' : 'Click to change role'}
+                              className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider transition-colors ${roleInfo.color} ${canEditRole ? 'cursor-pointer hover:opacity-80' : 'cursor-default opacity-70'}`}
                             >
                               <HiOutlineShieldCheck className="w-3 h-3" />
                               {roleInfo.label}
@@ -188,7 +214,7 @@ export default function Users() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-center">
-                          {can('users.update') ? (
+                          {canToggle ? (
                             <button
                               onClick={() =>
                                 updateMutation.mutate({
@@ -206,7 +232,7 @@ export default function Users() {
                               {user.canDownload ? 'Enabled' : 'Disabled'}
                             </button>
                           ) : (
-                            <span className={`inline-block px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider ${
+                            <span className={`inline-block px-2.5 py-1 rounded-full text-2xs font-black uppercase tracking-wider opacity-70 ${
                               user.canDownload ? 'bg-indigo-100 text-indigo-700' : 'bg-gray-100 text-gray-500'
                             }`}>
                               <HiOutlineDownload className="w-3 h-3 inline mr-1" />
@@ -223,7 +249,8 @@ export default function Users() {
                               onClick={() => {
                                 if (confirm('Delete this user?')) deleteMutation.mutate(user._id)
                               }}
-                              disabled={['admin', 'super_admin'].includes(user.role) && !isSuperAdmin}
+                              disabled={!canDeleteUser(user._id, user.role)}
+                              title={isSelf ? 'Cannot delete yourself' : undefined}
                               className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                               <HiOutlineTrash className="w-4 h-4" />
