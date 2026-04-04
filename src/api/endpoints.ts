@@ -111,3 +111,30 @@ export const replyContact = (id: string, reply: string) =>
   api.post(`/admin/contacts/${id}/reply`, { reply })
 export const deleteContact = (id: string) =>
   api.delete(`/admin/contacts/${id}`)
+
+// Library Links
+export const getLibraryLinks = () => api.get('/admin/library-links')
+export const createLibraryLink = (data: FormData) =>
+  api.post('/admin/library-links', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateLibraryLink = (id: string, data: FormData) =>
+  api.put(`/admin/library-links/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const deleteLibraryLink = (id: string) =>
+  api.delete(`/admin/library-links/${id}`)
+
+// Archive Items
+export const getArchiveItems = () => api.get('/admin/archive-items')
+export const createArchiveItem = (data: FormData) =>
+  api.post('/admin/archive-items', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateArchiveItem = (id: string, data: FormData) =>
+  api.put(`/admin/archive-items/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const deleteArchiveItem = (id: string) =>
+  api.delete(`/admin/archive-items/${id}`)
+
+// Resource Centers (Community)
+export const getResourceCenters = () => api.get('/admin/resource-centers')
+export const createResourceCenter = (data: FormData) =>
+  api.post('/admin/resource-centers', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateResourceCenter = (id: string, data: FormData) =>
+  api.put(`/admin/resource-centers/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const deleteResourceCenter = (id: string) =>
+  api.delete(`/admin/resource-centers/${id}`)

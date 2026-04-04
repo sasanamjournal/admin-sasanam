@@ -14,6 +14,9 @@ import Sections from './pages/Sections'
 import BooksPage from './pages/Books'
 import Roles from './pages/Roles'
 import Contacts from './pages/Contacts'
+import LibraryLinks from './pages/LibraryLinks'
+import ArchiveItems from './pages/ArchiveItems'
+import ResourceCenters from './pages/ResourceCenters'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const token = localStorage.getItem('admin_token')
@@ -45,6 +48,9 @@ export default function App() {
         <Route path="sections" element={<Sections />} />
         <Route path="books" element={<BooksPage />} />
         <Route path="contacts" element={<Contacts />} />
+        <Route path="library-links" element={<LibraryLinks />} />
+        <Route path="archive-items" element={<ArchiveItems />} />
+        <Route path="resource-centers" element={<ResourceCenters />} />
         <Route path="roles" element={<Roles />} />
       </Route>
     </Routes>
