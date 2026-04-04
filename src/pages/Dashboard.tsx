@@ -1,6 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
-import { getDashboard } from '../api/endpoints'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getDashboard, getSiteSettings, updateSiteSettings } from '../api/endpoints'
 import { useState, useEffect } from 'react'
+import { toast } from 'react-toastify'
 import {
   HiOutlineUsers,
   HiOutlineCreditCard,
@@ -12,6 +13,9 @@ import {
   HiOutlineDownload,
   HiOutlineTrendingUp,
   HiOutlineCalendar,
+  HiOutlineGlobeAlt,
+  HiOutlineEyeOff,
+  HiOutlineEye,
 } from 'react-icons/hi'
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -41,6 +45,109 @@ function AnimatedNumber({ value, prefix = '' }: { value: number; prefix?: string
     return () => clearInterval(timer)
   }, [value])
   return <>{prefix}{display.toLocaleString()}</>
+}
+
+function LaunchControl() {
+  const queryClient = useQueryClient()
+  const { data: settings } = useQuery({
+    queryKey: ['siteSettings'],
+    queryFn: () => getSiteSettings().then((r) => r.data.data),
+  })
+  const [launchDate, setLaunchDate] = useState('')
+
+  useEffect(() => {
+    if (settings?.launchDate) {
+      setLaunchDate(new Date(settings.launchDate).toISOString().slice(0, 16))
+    }
+  }, [settings?.launchDate])
+
+  const toggleMut = useMutation({
+    mutationFn: (isLive: boolean) => updateSiteSettings({ isLive }),
+    onSuccess: (res) => {
+      queryClient.invalidateQueries({ queryKey: ['siteSettings'] })
+      toast.success(res.data.data.isLive ? 'Site is now LIVE!' : 'Site is now in countdown mode')
+    },
+    onError: () => toast.error('Failed to update'),
+  })
+
+  const dateMut = useMutation({
+    mutationFn: (date: string | null) => updateSiteSettings({ launchDate: date }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['siteSettings'] })
+      toast.success('Launch date updated')
+    },
+    onError: () => toast.error('Failed to update'),
+  })
+
+  const isLive = settings?.isLive ?? false
+
+  // Countdown calculation
+  const now = new Date()
+  const target = settings?.launchDate ? new Date(settings.launchDate) : null
+  const diff = target ? Math.max(0, target.getTime() - now.getTime()) : 0
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+
+  return (
+    <div className={`rounded-2xl border shadow-sm overflow-hidden ${isLive ? 'bg-emerald-50 border-emerald-200' : 'bg-amber-50 border-amber-200'}`}>
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className={`h-14 w-14 rounded-2xl flex items-center justify-center shadow-md ${isLive ? 'bg-emerald-500' : 'bg-amber-500'}`}>
+              {isLive ? <HiOutlineEye className="w-7 h-7 text-white" /> : <HiOutlineEyeOff className="w-7 h-7 text-white" />}
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-body flex items-center gap-2">
+                <HiOutlineGlobeAlt className="w-5 h-5" />
+                Site Status
+              </h2>
+              <p className="text-sm text-muted mt-0.5">
+                {isLive ? (
+                  <span className="text-emerald-700 font-bold">LIVE — Site is visible to everyone</span>
+                ) : target && diff > 0 ? (
+                  <span className="text-amber-700 font-bold">Countdown: {days}d {hours}h {minutes}m remaining</span>
+                ) : (
+                  <span className="text-amber-700 font-bold">HIDDEN — Visitors see countdown page</span>
+                )}
+              </p>
+            </div>
+          </div>
+
+          <button
+            onClick={() => toggleMut.mutate(!isLive)}
+            disabled={toggleMut.isPending}
+            className={`px-6 py-3 rounded-xl text-sm font-black uppercase tracking-widest shadow-md transition-all hover:-translate-y-0.5 disabled:opacity-50 ${
+              isLive
+                ? 'bg-amber-500 text-white hover:bg-amber-600'
+                : 'bg-emerald-500 text-white hover:bg-emerald-600'
+            }`}
+          >
+            {isLive ? 'Take Offline' : 'Go Live Now'}
+          </button>
+        </div>
+
+        {!isLive && (
+          <div className="mt-4 pt-4 border-t border-amber-200 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+            <label className="text-xs font-black uppercase tracking-widest text-amber-700/70">Launch Date</label>
+            <input
+              type="datetime-local"
+              value={launchDate}
+              onChange={(e) => setLaunchDate(e.target.value)}
+              className="px-4 py-2.5 rounded-xl bg-white border border-amber-200 text-sm text-body focus:outline-none focus:border-amber-400"
+            />
+            <button
+              onClick={() => dateMut.mutate(launchDate ? new Date(launchDate).toISOString() : null)}
+              disabled={dateMut.isPending}
+              className="px-4 py-2.5 rounded-xl bg-primary text-white text-xs font-bold uppercase tracking-widest hover:bg-primary-light transition-colors disabled:opacity-50"
+            >
+              Set Date
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
 }
 
 export default function Dashboard() {
@@ -119,6 +226,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Launch Control */}
+      <LaunchControl />
 
       {/* User Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

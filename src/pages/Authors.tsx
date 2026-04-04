@@ -105,7 +105,8 @@ export default function Authors() {
   const imgUrl = (photo: string, w = 360) => {
     if (!photo) return ''
     if (photo.startsWith('http')) return photo
-    return `${API}/uploads/${photo}?w=${w}`
+    const key = photo.startsWith('uploads/') ? photo.slice(8) : photo
+    return `${API}/uploads/${key}?w=${w}`
   }
 
   return (

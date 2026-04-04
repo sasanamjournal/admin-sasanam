@@ -138,3 +138,8 @@ export const updateResourceCenter = (id: string, data: FormData) =>
   api.put(`/admin/resource-centers/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
 export const deleteResourceCenter = (id: string) =>
   api.delete(`/admin/resource-centers/${id}`)
+
+// Site Settings (Launch Control)
+export const getSiteSettings = () => api.get('/admin/site-settings')
+export const updateSiteSettings = (data: { isLive?: boolean; launchDate?: string | null }) =>
+  api.put('/admin/site-settings', data)

@@ -33,7 +33,8 @@ export default function ResourceCenters() {
   const imgUrl = (photo: string) => {
     if (!photo) return ''
     if (photo.startsWith('http')) return photo
-    return `${API}/uploads/${photo}?w=640`
+    const key = photo.startsWith('uploads/') ? photo.slice(8) : photo
+    return `${API}/uploads/${key}?w=640`
   }
 
   const buildFormData = () => {
