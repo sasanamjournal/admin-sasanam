@@ -225,6 +225,7 @@ export default function News() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-primary/10 bg-cream/50">
+                    <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Cover</th>
                     <th className="px-4 py-3 text-left text-2xs font-black uppercase tracking-widest text-primary/70">Title</th>
                     <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Category</th>
                     <th className="px-4 py-3 text-center text-2xs font-black uppercase tracking-widest text-primary/70">Author</th>
@@ -236,6 +237,15 @@ export default function News() {
                 <tbody>
                   {data?.news?.map((item: any) => (
                     <tr key={item._id} className="border-b border-primary/5 hover:bg-white/30 transition-colors">
+                      <td className="px-4 py-3">
+                        {item.imageUrl ? (
+                          <img src={imgUrl(item.imageUrl)} alt="" className="w-14 h-10 rounded-lg object-cover border border-primary/10" />
+                        ) : (
+                          <div className="w-14 h-10 rounded-lg bg-cream/60 border border-primary/10 flex items-center justify-center">
+                            <HiOutlinePhotograph className="w-4 h-4 text-primary/30" />
+                          </div>
+                        )}
+                      </td>
                       <td className="px-4 py-3">
                         <p className="font-bold text-body line-clamp-1">{item.title}</p>
                         <p className="text-2xs text-muted line-clamp-1 mt-0.5">{item.content?.substring(0, 80)}...</p>
