@@ -81,6 +81,9 @@ function LaunchControl() {
 
   const isLive = settings?.isLive ?? false
 
+  // Min date = today (block past dates)
+  const todayMin = new Date().toISOString().slice(0, 16)
+
   // Countdown calculation
   const now = new Date()
   const target = settings?.launchDate ? new Date(settings.launchDate) : null
@@ -133,6 +136,7 @@ function LaunchControl() {
             <input
               type="datetime-local"
               value={launchDate}
+              min={todayMin}
               onChange={(e) => setLaunchDate(e.target.value)}
               className="px-4 py-2.5 rounded-xl bg-white border border-amber-200 text-sm text-body focus:outline-none focus:border-amber-400"
             />
