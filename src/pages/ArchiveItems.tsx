@@ -85,7 +85,9 @@ export default function ArchiveItems() {
   const handleEdit = (item: any) => {
     setForm({ title: item.title, period: item.period || '', content: item.content, isPublished: item.isPublished, order: item.order || 0 })
     setEditId(item._id)
-    setExistingImages(item.images || [])
+    // Backward compat: old items have imageUrl (string), new items have images (array)
+    const imgs = item.images && item.images.length > 0 ? item.images : (item.imageUrl ? [item.imageUrl] : [])
+    setExistingImages(imgs)
     setNewFiles([]); setNewPreviews([])
     setShowForm(true)
   }
@@ -244,7 +246,7 @@ export default function ArchiveItems() {
               </thead>
               <tbody>
                 {data?.map((item: any) => {
-                  const imgs = item.images || []
+                  const imgs = item.images && item.images.length > 0 ? item.images : (item.imageUrl ? [item.imageUrl] : [])
                   return (
                     <tr key={item._id} className="border-b border-primary/5 hover:bg-white/30 transition-colors">
                       <td className="px-4 py-3">
