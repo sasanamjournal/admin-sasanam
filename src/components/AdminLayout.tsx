@@ -36,6 +36,7 @@ const navItems = [
   { to: '/authors', icon: HiOutlinePencil, label: 'Authors', permission: 'authors.view' },
   { to: '/sections', icon: HiOutlineCollection, label: 'Sections', permission: 'authors.view' },
   { to: '/books', icon: HiOutlineBookOpen, label: 'Books', permission: 'authors.view' },
+  { to: '/bulkbooks', icon: HiOutlineBookOpen, label: 'Bulk Books', permission: 'authors.view' },
   { to: '/contacts', icon: HiOutlineChatAlt2, label: 'Messages', permission: 'news.view' },
   { to: '/library-links', icon: HiOutlineLibrary, label: 'Library Links', permission: 'news.view' },
   { to: '/archive-items', icon: HiOutlineArchive, label: 'Archive', permission: 'news.view' },

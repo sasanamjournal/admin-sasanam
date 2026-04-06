@@ -12,6 +12,7 @@ import Team from './pages/Team'
 import Authors from './pages/Authors'
 import Sections from './pages/Sections'
 import BooksPage from './pages/Books'
+import BulkBooksPage from './pages/BulkBooks'
 import Roles from './pages/Roles'
 import Contacts from './pages/Contacts'
 import LibraryLinks from './pages/LibraryLinks'
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="authors" element={<Authors />} />
         <Route path="sections" element={<Sections />} />
         <Route path="books" element={<BooksPage />} />
+        <Route path="bulkbooks" element={<BulkBooksPage />} />
         <Route path="contacts" element={<Contacts />} />
         <Route path="library-links" element={<LibraryLinks />} />
         <Route path="archive-items" element={<ArchiveItems />} />

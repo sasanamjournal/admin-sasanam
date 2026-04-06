@@ -1,24 +1,24 @@
 import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { getBooks, createBook, updateBook, deleteBook, getSections } from '../api/endpoints'
+import { getBulkBooks, createBulkBook, updateBulkBook, deleteBulkBook, getSections } from '../api/endpoints'
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineFilter } from 'react-icons/hi'
 import { CardGridSkeleton } from '../components/Skeletons'
 import ImageCropper from '../components/ImageCropper'
 
-interface BookForm {
+interface BulkBookForm {
   bookName: string
   authorName: string
   sectionId: string
   description: string
 }
 
-const emptyForm: BookForm = { bookName: '', authorName: '', sectionId: '', description: '' }
+const emptyForm: BulkBookForm = { bookName: '', authorName: '', sectionId: '', description: '' }
 
-export default function BooksPage() {
+export default function BulkBooksPage() {
   const [showForm, setShowForm] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
-  const [form, setForm] = useState<BookForm>(emptyForm)
+  const [form, setForm] = useState<BulkBookForm>(emptyForm)
   const [pdfFile, setPdfFile] = useState<File | null>(null)
   const [coverImage, setCoverImage] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
@@ -36,30 +36,30 @@ export default function BooksPage() {
   })
 
   const { data, isLoading } = useQuery({
-    queryKey: ['books', page, filterSection, search],
+    queryKey: ['bulkbooks', page, filterSection, search],
     queryFn: () => {
       const params: Record<string, string | number> = { page, limit: 20 }
       if (filterSection) params.sectionId = filterSection
       if (search) params.search = search
-      return getBooks(params).then((r) => r.data.data)
+      return getBulkBooks(params).then((r) => r.data.data)
     },
   })
-
+  console.log(data,"data")
   const createMut = useMutation({
-    mutationFn: (fd: FormData) => createBook(fd),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['books'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Book added'); resetForm() },
+    mutationFn: (fd: FormData) => createBulkBook(fd),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bulkbooks'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Bulk Book added'); resetForm() },
     onError: (err: any) => toast.error(err?.response?.data?.error || 'Create failed'),
   })
 
   const updateMut = useMutation({
-    mutationFn: ({ id, fd }: { id: string; fd: FormData }) => updateBook(id, fd),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['books'] }); toast.success('Book updated'); resetForm() },
+    mutationFn: ({ id, fd }: { id: string; fd: FormData }) => updateBulkBook(id, fd),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bulkbooks'] }); toast.success('Bulk Book updated'); resetForm() },
     onError: (err: any) => toast.error(err?.response?.data?.error || 'Update failed'),
   })
 
   const deleteMut = useMutation({
-    mutationFn: deleteBook,
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['books'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Book deleted') },
+    mutationFn: deleteBulkBook,
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bulkbooks'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Bulk Book deleted') },
     onError: (err: any) => toast.error(err?.response?.data?.error || 'Delete failed'),
   })
 
@@ -105,6 +105,7 @@ export default function BooksPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    console.log(form, pdfFile, coverImage,"datas")
     if (!form.bookName || !form.authorName || !form.sectionId) return toast.error('Book name, author, and section are required')
 
     const fd = new FormData()
@@ -112,9 +113,10 @@ export default function BooksPage() {
     fd.append('authorName', form.authorName)
     fd.append('sectionId', form.sectionId)
     fd.append('description', form.description)
+    fd.append('order',"1")
     if (pdfFile) fd.append('pdfFile', pdfFile)
     if (coverImage) fd.append('coverImage', coverImage)
-
+     console.log(fd,"formdata")
     if (editId) updateMut.mutate({ id: editId, fd })
     else createMut.mutate(fd)
   }
@@ -129,14 +131,14 @@ export default function BooksPage() {
     <div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-serif font-black text-body">Books</h1>
+          <h1 className="text-2xl font-serif font-black text-body">Bulk Books</h1>
           <p className="text-sm text-muted mt-1">
-            Manage books &amp; PDFs {data ? `(${data.total} total)` : ''}
+            Manage bulk books &amp; PDFs {data ? `(${data.total} total)` : ''}
           </p>
         </div>
         <button onClick={() => { resetForm(); setShowForm(true) }}
           className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-bold shadow-md hover:bg-primary-light transition-colors">
-          <HiOutlinePlus className="w-4 h-4" /> Add Book
+          <HiOutlinePlus className="w-4 h-4" /> Add Bulk Book
         </button>
       </div>
 
@@ -145,7 +147,7 @@ export default function BooksPage() {
         <div className="relative flex-1">
           <input
             type="text"
-            placeholder="Search books..."
+            placeholder="Search bulk books..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1) }}
             className="w-full px-4 py-2.5 rounded-xl bg-card border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30"
@@ -171,7 +173,7 @@ export default function BooksPage() {
         <div className="fixed inset-0 z-50 flex items-start justify-center bg-black/30 overflow-y-auto py-6 px-4">
           <div className="bg-card rounded-2xl w-full max-w-md shadow-2xl border border-white/30">
             <div className="flex items-center justify-between px-4 py-3 border-b border-primary/10 sticky top-0 bg-card rounded-t-2xl z-10">
-              <h2 className="text-base font-bold text-body">{editId ? 'Edit Book' : 'Add Book'}</h2>
+              <h2 className="text-base font-bold text-body">{editId ? 'Edit Bulk Book' : 'Add Bulk Book'}</h2>
               <button onClick={resetForm} className="p-1 text-muted hover:text-primary"><HiOutlineX className="w-5 h-5" /></button>
             </div>
             <form onSubmit={handleSubmit} className="px-4 py-3 space-y-3">
@@ -249,7 +251,7 @@ export default function BooksPage() {
         </div>
       )}
 
-      {/* Books Table */}
+      {/* Bulk Books Table */}
       {isLoading ? (
         <CardGridSkeleton count={6} cols={1} />
       ) : (
@@ -268,10 +270,11 @@ export default function BooksPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {data?.books?.map((book: any) => (
+                  {data?.map((book: any) => (
                     <tr key={book._id} className="border-b border-primary/5 hover:bg-primary/3 transition-colors">
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
+                          <p className="font-bold text-body">{book.bookName}</p>
                         </div>
                         {book.description && <p className="text-xs text-muted mt-0.5 line-clamp-1">{book.description}</p>}
                       </td>
@@ -304,7 +307,7 @@ export default function BooksPage() {
                           <button onClick={() => handleEdit(book)} className="p-1.5 rounded-lg text-primary hover:bg-primary/10 transition-colors">
                             <HiOutlinePencil className="w-4 h-4" />
                           </button>
-                          <button onClick={() => { if (confirm('Delete this book and its files?')) deleteMut.mutate(book._id) }} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
+                          <button onClick={() => { if (confirm('Delete this bulk book and its files?')) deleteMut.mutate(book._id) }} className="p-1.5 rounded-lg text-red-500 hover:bg-red-50 transition-colors">
                             <HiOutlineTrash className="w-4 h-4" />
                           </button>
                         </div>
@@ -314,8 +317,8 @@ export default function BooksPage() {
                 </tbody>
               </table>
             </div>
-            {(!data?.books || data.books.length === 0) && (
-              <div className="text-center py-12 text-muted/60">No books found</div>
+            {(!data || data.length === 0) && (
+              <div className="text-center py-12 text-muted/60">No bulk books found</div>
             )}
           </div>
 

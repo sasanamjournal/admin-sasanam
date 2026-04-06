@@ -1,4 +1,15 @@
+
 import api from './axios'
+
+// Sasanma Bulk Books
+export const getBulkBooks = (params: Record<string, string | number>) =>
+  api.get('/admin/sasanam-bulkbooks', { params })
+export const createBulkBook = (data: FormData) =>
+  api.post('/admin/sasanam-bulkbooks', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const updateBulkBook = (id: string, data: FormData) =>
+  api.put(`/admin/sasanam-bulkbooks/${id}`, data, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const deleteBulkBook = (id: string) =>
+  api.delete(`/admin/sasanam-bulkbooks/${id}`)
 
 // Auth
 export const loginAdmin = (email: string, password: string) =>
