@@ -51,7 +51,7 @@ export default function DonationList() {
                   {data?.donations?.map((d: any) => (
                     <tr key={d._id} className="border-b border-primary/5 hover:bg-white/30 transition-colors">
                       <td className="px-4 py-3 font-bold text-body">{d.donaterName}</td>
-                      <td className="px-4 py-3 text-center font-black text-body">₹{(d.donationAmount / 100).toFixed(2)}</td>
+                      <td className="px-4 py-3 text-center font-black text-body">₹{(d.donationAmount).toFixed(2)}</td>
                       <td className="px-4 py-3 text-muted font-mono text-xs">{d.orderId}</td>
                       <td className="px-4 py-3 text-muted font-mono text-xs">{d.paymentId}</td>
                       <td className="px-4 py-3 text-center text-xs text-muted">
