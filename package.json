@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "clean": "rm -rf node_modules dist .vite",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
