@@ -39,6 +39,9 @@ export const deleteUser = (id: string) =>
 // Subscription Payments
 export const getSubscriptionPayments = (params: Record<string, string | number>) =>
   api.get('/admin/payments/subscriptions', { params })
+export const updatePayment = (payload:any) => {
+  api.put('/paymentLimit', payload)
+}
 
 // Donation Payments
 export const getDonationPayments = (params: Record<string, string | number>) =>

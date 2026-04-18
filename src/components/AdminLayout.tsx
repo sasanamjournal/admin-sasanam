@@ -40,6 +40,7 @@ const navItems = [
   { to: '/contacts', icon: HiOutlineChatAlt2, label: 'Messages', permission: 'news.view' },
   { to: '/library-links', icon: HiOutlineLibrary, label: 'Library Links', permission: 'news.view' },
   { to: '/archive-items', icon: HiOutlineArchive, label: 'Archive', permission: 'news.view' },
+  { to: '/pricing', icon: HiOutlineArchive, label: 'Pricing', permission: 'news.view' },
   { to: '/resource-centers', icon: HiOutlineGlobe, label: 'Resource Centers', permission: 'news.view' },
   { to: '/roles', icon: HiOutlineKey, label: 'Roles & Permissions', permission: 'users.view' },
 ]
