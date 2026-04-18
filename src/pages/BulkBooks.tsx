@@ -8,12 +8,10 @@ import ImageCropper from '../components/ImageCropper'
 
 interface BulkBookForm {
   bookName: string
-  authorName: string
-  sectionId: string
   description: string
 }
 
-const emptyForm: BulkBookForm = { bookName: '', authorName: '', sectionId: '', description: '' }
+const emptyForm: BulkBookForm = { bookName: '', description: '' }
 
 export default function BulkBooksPage() {
   const [showForm, setShowForm] = useState(false)
@@ -35,7 +33,7 @@ export default function BulkBooksPage() {
     queryFn: () => getSections().then((r) => r.data.data),
   })
 
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['bulkbooks', page, filterSection, search],
     queryFn: () => {
       const params: Record<string, string | number> = { page, limit: 20 }
@@ -43,6 +41,8 @@ export default function BulkBooksPage() {
       if (search) params.search = search
       return getBulkBooks(params).then((r) => r.data.data)
     },
+    staleTime: 0, 
+    gcTime: 0, 
   })
   console.log(data,"data")
   const createMut = useMutation({
@@ -62,7 +62,7 @@ export default function BulkBooksPage() {
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['bulkbooks'] }); queryClient.invalidateQueries({ queryKey: ['sections'] }); toast.success('Bulk Book deleted') },
     onError: (err: any) => toast.error(err?.response?.data?.error || 'Delete failed'),
   })
-
+const isDeleting = deleteMut.isPending;
   const resetForm = () => {
     setForm(emptyForm); setShowForm(false); setEditId(null)
     setPdfFile(null); setCoverImage(null); setCoverPreview(null); setCropSource(null)
@@ -93,8 +93,6 @@ export default function BulkBooksPage() {
   const handleEdit = (item: any) => {
     setForm({
       bookName: item.bookName,
-      authorName: item.authorName,
-      sectionId: item.sectionId?._id || item.sectionId || '',
       description: item.description || '',
     })
     setEditId(item._id)
@@ -106,14 +104,11 @@ export default function BulkBooksPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     console.log(form, pdfFile, coverImage,"datas")
-    if (!form.bookName || !form.authorName || !form.sectionId) return toast.error('Book name, author, and section are required')
+    if (!form.bookName ) return toast.error('Book name, author, and section are required')
 
     const fd = new FormData()
     fd.append('bookName', form.bookName)
-    fd.append('authorName', form.authorName)
-    fd.append('sectionId', form.sectionId)
     fd.append('description', form.description)
-    fd.append('order',"1")
     if (pdfFile) fd.append('pdfFile', pdfFile)
     if (coverImage) fd.append('coverImage', coverImage)
      console.log(fd,"formdata")
@@ -182,7 +177,7 @@ export default function BulkBooksPage() {
                 <input value={form.bookName} onChange={(e) => setForm({ ...form, bookName: e.target.value })}
                   className="w-full px-3 py-2 rounded-lg bg-white/50 border border-primary/10 text-sm text-body focus:outline-none focus:border-primary/30" required />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              {/* <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">Author Name</label>
                   <input value={form.authorName} onChange={(e) => setForm({ ...form, authorName: e.target.value })}
@@ -198,7 +193,7 @@ export default function BulkBooksPage() {
                     ))}
                   </select>
                 </div>
-              </div>
+              </div> */}
               <div>
                 <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">Description</label>
                 <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -252,7 +247,7 @@ export default function BulkBooksPage() {
       )}
 
       {/* Bulk Books Table */}
-      {isLoading ? (
+      {isLoading || isDeleting ? (
         <CardGridSkeleton count={6} cols={1} />
       ) : (
         <>
@@ -278,10 +273,10 @@ export default function BulkBooksPage() {
                         </div>
                         {book.description && <p className="text-xs text-muted mt-0.5 line-clamp-1">{book.description}</p>}
                       </td>
-                      <td className="px-5 py-3 text-muted">{book.authorName}</td>
+                      <td className="px-5 py-3 text-muted">Sasanam</td>
                       <td className="px-5 py-3">
                         <span className="inline-block px-2.5 py-1 rounded-lg bg-primary/8 text-primary text-xs font-bold">
-                          {getSectionName(book)}
+                          Sasanam
                         </span>
                       </td>
                       <td className="px-5 py-3">
