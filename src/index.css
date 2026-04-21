@@ -2,8 +2,8 @@
 
 @theme {
   /* ── Fonts ── */
-  --font-serif: 'Cinzel', 'IBM Plex Serif', serif;
-  --font-sans: 'IBM Plex Serif', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: "Outfit", sans-serif;
+  --font-sans: "Inter", sans-serif;
 
   /* ── Colors ── */
   --color-primary: #8B4513;
