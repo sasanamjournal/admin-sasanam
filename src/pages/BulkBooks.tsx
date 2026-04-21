@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
-import { getBulkBooks, createBulkBook, updateBulkBook, deleteBulkBook, getSections } from '../api/endpoints'
+import { getBulkBooks, createBulkBook, updateBulkBook, deleteBulkBook, getSections, initiateUpload, completeUpload, abortUpload } from '../api/endpoints'
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineFilter } from 'react-icons/hi'
 import { CardGridSkeleton } from '../components/Skeletons'
 import ImageCropper from '../components/ImageCropper'
@@ -18,6 +18,10 @@ export default function BulkBooksPage() {
   const [editId, setEditId] = useState<string | null>(null)
   const [form, setForm] = useState<BulkBookForm>(emptyForm)
   const [pdfFile, setPdfFile] = useState<File | null>(null)
+  const [pdfKey, setPdfKey] = useState<string | null>(null)
+  const [pdfUploadProgress, setPdfUploadProgress] = useState<number | null>(null)
+  const [pdfUploading, setPdfUploading] = useState(false)
+  const uploadAbortRef = useRef<{ uploadId: string; key: string } | null>(null)
   const [coverImage, setCoverImage] = useState<File | null>(null)
   const [coverPreview, setCoverPreview] = useState<string | null>(null)
   const [cropSource, setCropSource] = useState<string | null>(null)
@@ -65,9 +69,59 @@ export default function BulkBooksPage() {
 const isDeleting = deleteMut.isPending;
   const resetForm = () => {
     setForm(emptyForm); setShowForm(false); setEditId(null)
-    setPdfFile(null); setCoverImage(null); setCoverPreview(null); setCropSource(null)
+    setPdfFile(null); setPdfKey(null); setPdfUploadProgress(null); setPdfUploading(false)
+    uploadAbortRef.current = null
+    setCoverImage(null); setCoverPreview(null); setCropSource(null)
     if (pdfRef.current) pdfRef.current.value = ''
     if (coverRef.current) coverRef.current.value = ''
+  }
+
+  const uploadPdfDirectly = async (file: File) => {
+    setPdfUploading(true)
+    setPdfUploadProgress(0)
+    uploadAbortRef.current = null
+    try {
+      const { data: initData } = await initiateUpload(file.name, file.size, file.type)
+      const { uploadId, key, parts, chunkSize } = initData.data
+      uploadAbortRef.current = { uploadId, key }
+
+      const completedParts: { PartNumber: number; ETag: string }[] = []
+
+      for (const part of parts) {
+        const start = (part.partNumber - 1) * chunkSize
+        const chunk = file.slice(start, start + chunkSize)
+
+        const res = await fetch(part.url, {
+          method: 'PUT',
+          body: chunk,
+          headers: { 'Content-Type': file.type },
+        })
+
+        if (!res.ok) throw new Error(`Part ${part.partNumber} upload failed: ${res.status}`)
+
+        const etag = res.headers.get('ETag') || res.headers.get('etag')
+        if (!etag) throw new Error(`No ETag returned for part ${part.partNumber}`)
+
+        completedParts.push({ PartNumber: part.partNumber, ETag: etag })
+        setPdfUploadProgress(Math.round((completedParts.length / parts.length) * 100))
+      }
+
+      await completeUpload(uploadId, key, completedParts)
+      setPdfKey(key)
+      uploadAbortRef.current = null
+      toast.success('PDF uploaded to Cloudflare R2')
+    } catch (err: any) {
+      toast.error(err?.message || 'PDF upload failed')
+      if (uploadAbortRef.current) {
+        abortUpload(uploadAbortRef.current.uploadId, uploadAbortRef.current.key).catch(() => {})
+        uploadAbortRef.current = null
+      }
+      setPdfFile(null)
+      setPdfKey(null)
+      if (pdfRef.current) pdfRef.current.value = ''
+    } finally {
+      setPdfUploading(false)
+    }
   }
 
   const handleCoverSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,21 +151,22 @@ const isDeleting = deleteMut.isPending;
     })
     setEditId(item._id)
     setPdfFile(null)
+    setPdfKey(null)
     setCoverImage(null)
     setShowForm(true)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    console.log(form, pdfFile, coverImage,"datas")
-    if (!form.bookName ) return toast.error('Book name, author, and section are required')
+    if (!form.bookName) return toast.error('Book name is required')
+    if (pdfUploading) return toast.error('PDF is still uploading, please wait')
 
     const fd = new FormData()
     fd.append('bookName', form.bookName)
     fd.append('description', form.description)
-    if (pdfFile) fd.append('pdfFile', pdfFile)
+    if (pdfKey) fd.append('pdfKey', pdfKey)
+    else if (pdfFile) fd.append('pdfFile', pdfFile)
     if (coverImage) fd.append('coverImage', coverImage)
-     console.log(fd,"formdata")
     if (editId) updateMut.mutate({ id: editId, fd })
     else createMut.mutate(fd)
   }
@@ -207,12 +262,27 @@ const isDeleting = deleteMut.isPending;
                   <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">
                     PDF {editId && '(optional)'}
                   </label>
-                  <label className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed border-primary/20 cursor-pointer hover:border-primary/40 transition-colors">
-                    <HiOutlineDocumentText className="w-4 h-4 text-primary/60 shrink-0" />
-                    <span className="text-xs text-muted truncate">{pdfFile ? pdfFile.name : 'Choose PDF'}</span>
-                    <input ref={pdfRef} type="file" accept=".pdf" className="hidden"
-                      onChange={(e) => setPdfFile(e.target.files?.[0] || null)} />
+                  <label className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-white/50 border border-dashed transition-colors ${pdfUploading ? 'border-primary/40 cursor-not-allowed' : 'border-primary/20 cursor-pointer hover:border-primary/40'}`}>
+                    <HiOutlineDocumentText className={`w-4 h-4 shrink-0 ${pdfKey ? 'text-green-500' : 'text-primary/60'}`} />
+                    <span className="text-xs text-muted truncate">
+                      {pdfUploading ? `Uploading… ${pdfUploadProgress}%` : pdfKey ? pdfFile?.name ?? 'Uploaded' : 'Choose PDF'}
+                    </span>
+                    <input ref={pdfRef} type="file" accept=".pdf" className="hidden" disabled={pdfUploading}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        setPdfFile(file)
+                        setPdfKey(null)
+                        if (file) uploadPdfDirectly(file)
+                      }} />
                   </label>
+                  {pdfUploading && (
+                    <div className="mt-1 h-1.5 rounded-full bg-primary/10 overflow-hidden">
+                      <div className="h-full bg-primary transition-all duration-300 rounded-full" style={{ width: `${pdfUploadProgress ?? 0}%` }} />
+                    </div>
+                  )}
+                  {pdfKey && !pdfUploading && (
+                    <p className="mt-1 text-2xs text-green-600 font-bold">✓ Ready to save</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-2xs font-black uppercase tracking-widest text-primary/70 mb-1">
@@ -237,9 +307,9 @@ const isDeleting = deleteMut.isPending;
                 </div>
               </div>
 
-              <button type="submit" disabled={createMut.isPending || updateMut.isPending}
+              <button type="submit" disabled={createMut.isPending || updateMut.isPending || pdfUploading}
                 className="w-full py-2.5 rounded-lg bg-primary text-white font-bold text-sm uppercase tracking-widest hover:bg-primary-light transition-colors disabled:opacity-50">
-                {(createMut.isPending || updateMut.isPending) ? 'Uploading...' : editId ? 'Update' : 'Create'}
+                {pdfUploading ? `Uploading PDF… ${pdfUploadProgress}%` : (createMut.isPending || updateMut.isPending) ? 'Saving...' : editId ? 'Update' : 'Create'}
               </button>
             </form>
           </div>
