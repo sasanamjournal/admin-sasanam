@@ -97,6 +97,14 @@ export const updateSection = (id: string, data: { name: string }) =>
 export const deleteSection = (id: string) =>
   api.delete(`/admin/sections/${id}`)
 
+// Direct-to-R2 multipart upload (for large PDFs)
+export const initiateUpload = (filename: string, fileSize: number, fileType: string) =>
+  api.post('/admin/upload/initiate', { filename, fileSize, fileType })
+export const completeUpload = (uploadId: string, key: string, parts: { PartNumber: number; ETag: string }[]) =>
+  api.post('/admin/upload/complete', { uploadId, key, parts })
+export const abortUpload = (uploadId: string, key: string) =>
+  api.post('/admin/upload/abort', { uploadId, key })
+
 // Books
 export const getBooks = (params: Record<string, string | number>) =>
   api.get('/admin/books', { params })
