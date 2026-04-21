@@ -79,8 +79,8 @@ export default function AdminLayout() {
     <>
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-primary/15">
-        <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
-          <span className="text-white font-serif font-black text-lg">S</span>
+        <div className="h-10 w-10 flex items-center justify-center shrink-0">
+          <img src="/logo-transparent.webp" alt="Sasanam Logo" className="h-full w-full object-contain" />
         </div>
         <div>
           <h1 className="font-serif font-black text-primary text-lg tracking-wide">Sasanam</h1>
@@ -178,8 +178,8 @@ export default function AdminLayout() {
           >
             <HiOutlineMenu className="w-6 h-6" />
           </button>
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-primary to-primary-dark flex items-center justify-center shadow-sm">
-            <span className="text-white font-serif font-black text-sm">S</span>
+          <div className="h-8 w-8 flex items-center justify-center shrink-0">
+            <img src="/logo-transparent.webp" alt="Sasanam Logo" className="h-full w-full object-contain" />
           </div>
           <h1 className="font-serif font-black text-primary text-lg">Sasanam Admin</h1>
         </header>
