@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { updatePayment } from '../api/endpoints';
 import api from '../api/axios';
+import axios from 'axios';
 
 const Pricing = () => {
   const [minDonation, setMinDonation] = useState<string>('');
@@ -19,7 +20,7 @@ const Pricing = () => {
       doantion: Number(minDonation),
       subcribe: Number(minSubscription)
     };
-    const res:any = updatePayment(payload);
+    const res:any = await axios.put('https://api.sasanam.in/paymentLimit', payload);
     getPaymentDetails();
       setLoading(false);
   };
@@ -46,11 +47,11 @@ const Pricing = () => {
             <span className="absolute left-3 top-2 text-gray-400">$</span>
            <input
   type="text"
-  value={minSubscription}
+  value={minDonation}
   onChange={(e) => {
     const value:any = e.target.value;
     if (/^\d*\.?\d*$/.test(value)) {
-      setMinSubscription(value);
+      setMinDonation(value);
     }
   }}
   className="w-full pl-8 pr-4 py-2 border border-[#EADDCA] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B5E3C] bg-white"
@@ -62,13 +63,13 @@ const Pricing = () => {
             <span className="absolute left-3 top-2 text-gray-400">$</span>
             <input 
               type="text"
-              value={minDonation}
+              value={minSubscription}
               onChange={(e) => {
                 const value:any = e.target.value;
 
                 // Allow only digits and optional decimal
                 if (/^\d*\.?\d*$/.test(value)) {
-                  setMinDonation(value);
+                  setMinSubscription(value);
                 }
               }}
               className="w-full pl-8 pr-4 py-2 border border-[#EADDCA] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#8B5E3C] bg-white"
