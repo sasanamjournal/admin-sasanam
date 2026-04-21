@@ -76,7 +76,7 @@ const isDeleting = deleteMut.isPending;
     if (coverRef.current) coverRef.current.value = ''
   }
 
-  const uploadPdfDirectly = async (file: File) => {
+  const uploadPdfDirectly = async (file: File): Promise<string | null> => {
     setPdfUploading(true)
     setPdfUploadProgress(0)
     uploadAbortRef.current = null
@@ -110,6 +110,7 @@ const isDeleting = deleteMut.isPending;
       setPdfKey(key)
       uploadAbortRef.current = null
       toast.success('PDF uploaded to Cloudflare R2')
+      return key
     } catch (err: any) {
       toast.error(err?.message || 'PDF upload failed')
       if (uploadAbortRef.current) {
@@ -119,6 +120,7 @@ const isDeleting = deleteMut.isPending;
       setPdfFile(null)
       setPdfKey(null)
       if (pdfRef.current) pdfRef.current.value = ''
+      return null
     } finally {
       setPdfUploading(false)
     }
@@ -156,17 +158,24 @@ const isDeleting = deleteMut.isPending;
     setShowForm(true)
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!form.bookName) return toast.error('Book name is required')
     if (pdfUploading) return toast.error('PDF is still uploading, please wait')
 
+    let finalPdfKey = pdfKey
+
+    if (pdfFile && !finalPdfKey) {
+      finalPdfKey = await uploadPdfDirectly(pdfFile)
+      if (!finalPdfKey) return // upload failed securely
+    }
+
     const fd = new FormData()
     fd.append('bookName', form.bookName)
     fd.append('description', form.description)
-    if (pdfKey) fd.append('pdfKey', pdfKey)
-    else if (pdfFile) fd.append('pdfFile', pdfFile)
+    if (finalPdfKey) fd.append('pdfKey', finalPdfKey)
     if (coverImage) fd.append('coverImage', coverImage)
+    
     if (editId) updateMut.mutate({ id: editId, fd })
     else createMut.mutate(fd)
   }
@@ -272,7 +281,6 @@ const isDeleting = deleteMut.isPending;
                         const file = e.target.files?.[0] || null
                         setPdfFile(file)
                         setPdfKey(null)
-                        if (file) uploadPdfDirectly(file)
                       }} />
                   </label>
                   {pdfUploading && (
