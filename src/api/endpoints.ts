@@ -97,6 +97,10 @@ export const updateSection = (id: string, data: { name: string }) =>
 export const deleteSection = (id: string) =>
   api.delete(`/admin/sections/${id}`)
 
+// Bulk Books reorder
+export const reorderBulkBooks = (ids: string[]) =>
+  api.put('/admin/sasanam-bulkbooks/reorder', { ids })
+
 // Direct-to-R2 multipart upload (for large PDFs)
 export const initiateUpload = (filename: string, fileSize: number, fileType: string) =>
   api.post('/admin/upload/initiate', { filename, fileSize, fileType })

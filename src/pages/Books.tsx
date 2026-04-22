@@ -2,6 +2,8 @@ import { useState, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getBooks, createBook, updateBook, deleteBook, getSections, initiateUpload, completeUpload, abortUpload } from '../api/endpoints'
+
+const UPLOAD_CONCURRENCY = 3
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineFilter } from 'react-icons/hi'
 import { CardGridSkeleton } from '../components/Skeletons'
 import ImageCropper from '../components/ImageCropper'
@@ -86,24 +88,28 @@ export default function BooksPage() {
       uploadAbortRef.current = { uploadId, key }
 
       const completedParts: { PartNumber: number; ETag: string }[] = []
+      let done = 0
 
-      for (const part of parts) {
-        const start = (part.partNumber - 1) * chunkSize
-        const chunk = file.slice(start, start + chunkSize)
-
-        const res = await fetch(part.url, {
-          method: 'PUT',
-          body: chunk,
-          headers: { 'Content-Type': file.type },
-        })
-
-        if (!res.ok) throw new Error(`Part ${part.partNumber} upload failed: ${res.status}`)
-
-        const etag = res.headers.get('ETag') || res.headers.get('etag')
-        if (!etag) throw new Error(`No ETag returned for part ${part.partNumber}`)
-
-        completedParts.push({ PartNumber: part.partNumber, ETag: etag })
-        setPdfUploadProgress(Math.round((completedParts.length / parts.length) * 100))
+      for (let i = 0; i < parts.length; i += UPLOAD_CONCURRENCY) {
+        const batch = parts.slice(i, i + UPLOAD_CONCURRENCY)
+        const results = await Promise.all(
+          batch.map(async (part: { partNumber: number; url: string }) => {
+            const start = (part.partNumber - 1) * chunkSize
+            const chunk = file.slice(start, start + chunkSize)
+            const res = await fetch(part.url, {
+              method: 'PUT',
+              body: chunk,
+              headers: { 'Content-Type': file.type },
+            })
+            if (!res.ok) throw new Error(`Part ${part.partNumber} upload failed: ${res.status}`)
+            const etag = res.headers.get('ETag') || res.headers.get('etag')
+            if (!etag) throw new Error(`No ETag returned for part ${part.partNumber}`)
+            return { PartNumber: part.partNumber, ETag: etag }
+          })
+        )
+        completedParts.push(...results)
+        done += batch.length
+        setPdfUploadProgress(Math.round((done / parts.length) * 100))
       }
 
       await completeUpload(uploadId, key, completedParts)
@@ -341,8 +347,7 @@ export default function BooksPage() {
                   {data?.books?.map((book: any) => (
                     <tr key={book._id} className="border-b border-primary/5 hover:bg-primary/3 transition-colors">
                       <td className="px-5 py-3">
-                        <div className="flex items-center gap-2">
-                        </div>
+                        <p className="font-bold text-body">{book.bookName}</p>
                         {book.description && <p className="text-xs text-muted mt-0.5 line-clamp-1">{book.description}</p>}
                       </td>
                       <td className="px-5 py-3 text-muted">{book.authorName}</td>
