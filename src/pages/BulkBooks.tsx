@@ -12,7 +12,7 @@ import {
 import { CardGridSkeleton } from '../components/Skeletons'
 import ImageCropper from '../components/ImageCropper'
 
-const UPLOAD_CONCURRENCY = 3 // parallel chunk uploads
+const UPLOAD_CONCURRENCY = 6 // parallel chunk uploads
 
 interface BulkBookForm {
   bookName: string

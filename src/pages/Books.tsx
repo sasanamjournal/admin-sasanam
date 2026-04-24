@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'react-toastify'
 import { getBooks, createBook, updateBook, deleteBook, getSections, initiateUpload, completeUpload, abortUpload } from '../api/endpoints'
 
-const UPLOAD_CONCURRENCY = 3
+const UPLOAD_CONCURRENCY = 6
 import { HiOutlinePlus, HiOutlinePencil, HiOutlineTrash, HiOutlineX, HiOutlineDocumentText, HiOutlinePhotograph, HiOutlineFilter } from 'react-icons/hi'
 import { CardGridSkeleton } from '../components/Skeletons'
 import ImageCropper from '../components/ImageCropper'
