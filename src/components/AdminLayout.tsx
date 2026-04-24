@@ -79,8 +79,8 @@ export default function AdminLayout() {
     <>
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-primary/15">
-        <div className="h-10 w-10 flex items-center justify-center shrink-0">
-          <img src="/logo-transparent.webp" alt="Sasanam Logo" className="h-full w-full object-contain" />
+        <div className="h-5 w-5 flex items-center justify-center shrink-0">
+          <img src="/apple-touch-icon.png" alt="Sasanam Logo" className="h-full w-full object-contain" />
         </div>
         <div>
           <h1 className="font-serif font-black text-primary text-lg tracking-wide">Sasanam</h1>
